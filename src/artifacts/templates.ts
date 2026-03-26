@@ -534,3 +534,58 @@ export function getStyleGuideLibrary(): TemplateFile[] {
     { filename: "python.md", content: pythonStyleGuide },
   ];
 }
+
+/**
+ * Track Specification template
+ */
+export const trackSpecTemplate: string = `# Specification: {{track_title}}
+
+## Overview
+{{track_description}}
+
+## User Stories
+- [ ] As a developer, I want {{feature_goal}}
+
+## Functional Requirements
+- {{requirement_1}}
+
+## Technical Design
+{{technical_design}}
+
+## Acceptance Criteria
+- [ ] All requirements met
+- [ ] Tests passing
+`;
+
+/**
+ * Track Implementation Plan template
+ */
+export const trackPlanTemplate: string = `# Implementation Plan: {{track_title}}
+
+This plan outlines the steps to implement {{track_title}}.
+
+## Phase 1: Foundation
+- [ ] Task: {{initial_task}}
+    - [ ] Subtask 1
+- [ ] Task: Conductor - User Manual Verification 'Foundation' (Protocol in workflow.md)
+
+## Phase 2: Implementation
+- [ ] Task: Core logic implementation
+- [ ] Task: Conductor - User Manual Verification 'Implementation' (Protocol in workflow.md)
+
+## Phase 3: Finalization
+- [ ] Task: Integration and cleanup
+- [ ] Task: Conductor - User Manual Verification 'Finalization' (Protocol in workflow.md)
+`;
+
+/**
+ * Track Metadata template
+ */
+export const trackMetadataTemplate: string = \`{
+  "id": "{{track_id}}",
+  "title": "{{track_title}}",
+  "description": "{{track_description}}",
+  "created": "{{created_date}}",
+  "status": "pending"
+}
+\`;

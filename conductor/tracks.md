@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Refactor conductor:setup into a stateful interactive wizard**
+- [~] **Track: Refactor conductor:setup into a stateful interactive wizard**
       *Link: [./tracks/setup_wizard_20260326/](./tracks/setup_wizard_20260326/)*

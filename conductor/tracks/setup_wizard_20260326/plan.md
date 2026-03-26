@@ -27,12 +27,12 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 
 ## Phase 3: Tracks & Scaffolding
 - [x] Task: Create the `conductor/index.md` context hub. [fdbf5b8]
-- [ ] Task: Implement the Initial Track Scaffolder.
-    - [ ] Logic to propose a track title based on product definition.
-    - [ ] Automated generation of `spec.md`, phased `plan.md`, and `metadata.json`.
-    - [ ] Registry update in `conductor/tracks.md`.
-- [ ] Task: Implement Git Integration.
-    - [ ] Trigger `git init` where needed and perform the final `conductor(setup)` commit.
+- [x] Task: Implement the Initial Track Scaffolder. [1a70f13]
+    - [x] Logic to propose a track title based on product definition.
+    - [x] Automated generation of `spec.md`, phased `plan.md`, and `metadata.json`.
+    - [x] Registry update in `conductor/tracks.md`.
+- [x] Task: Implement Git Integration. [e632452]
+    - [x] Trigger `git init` where needed and perform the final `conductor(setup)` commit.
 - [ ] Task: Conductor - User Manual Verification 'Tracks & Scaffolding' (Protocol in workflow.md)
 
 ## Phase 4: Integration & Validation

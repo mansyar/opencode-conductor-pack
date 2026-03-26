@@ -41,7 +41,7 @@ describe("setup command", () => {
   });
 
   describe("executeSetupCommand", () => {
-    it("should initialize discovery and move through all steps to tracks", async () => {
+    it("should initialize discovery and move through all steps to git", async () => {
       const context = createMockContext(testDir);
       const client = createMockClient();
       
@@ -51,13 +51,18 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelinesMode
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techStackMode
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md"] } }); // styleGuides
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Initial Track" } }); // tracks (Initial Track)
       
       const result = await executeSetupCommand(client as any, context as any);
 
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
       expect(fs.existsSync(path.join(conductorDir, "index.md"))).toBe(true);
-      expect(fs.existsSync(path.join(conductorDir, "workflow.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tracks.md"))).toBe(true);
+      
+      // Verify track folder creation (ID is dynamic based on date, so we check for folder containing 'initial_track')
+      const tracksDir = path.join(conductorDir, "tracks");
+      const subdirs = fs.readdirSync(tracksDir);
+      expect(subdirs.some(d => d.startsWith("initial_track"))).toBe(true);
     });
 
     it("should ask to resume if state exists", async () => {
@@ -80,11 +85,12 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
     });
 
     it("should restart from discovery if user chooses not to resume", async () => {
@@ -107,15 +113,16 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
       
       const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
-      expect(state.currentStep).toBe("tracks");
-      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides", "scaffolding"]);
+      expect(state.currentStep).toBe("git");
+      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides", "scaffolding", "tracks"]);
     });
 
     it("should generate product.md using interactive questions", async () => {
@@ -140,10 +147,11 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -162,17 +170,18 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
       expect(content).toContain("# Inferred Product Name");
     });
 
-    it("should generate guidelines, tech-stack and style guides for brownfield project", async () => {
+    it("should generate guidelines, tech-stack, style guides and tracks for brownfield project", async () => {
       const context = createMockContext(testDir);
       const client = createMockClient();
       
@@ -196,18 +205,23 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md", "general.md"] } }); // styleguides
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Fix Bugs" } }); // tracks
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: tracks");
+      expect(result).toContain("Setup paused at step: git");
       expect(fs.existsSync(path.join(conductorDir, "product-guidelines.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tech-stack.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "typescript.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "general.md"))).toBe(true);
       
+      // Verify track entry in tracks.md
+      const tracksRegistry = fs.readFileSync(path.join(conductorDir, "tracks.md"), "utf-8");
+      expect(tracksRegistry).toContain("Track: Fix Bugs");
+
       const tsContent = fs.readFileSync(path.join(conductorDir, "tech-stack.md"), "utf-8");
       expect(tsContent).toContain("TypeScript/JavaScript");
       expect(tsContent).toContain("pnpm");
-    });
-  });
-});
+      });
+      });
+      });
