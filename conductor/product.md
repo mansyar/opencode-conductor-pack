@@ -65,3 +65,4 @@ The plugin is built on:
 - [OpenCode Plugin API](https://opencode.ai/docs/plugins)
 - [OpenCode SDK](https://opencode.ai/docs/sdk)
 - [OpenCode Plugin Examples](https://opencode.ai/docs/plugins/#examples)
+- [OpenCode Tools](https://opencode.ai/docs/tools/)
