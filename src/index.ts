@@ -14,9 +14,16 @@ export const ConductorPlugin: Plugin = async ({ client, $, directory, worktree }
         description: "Initialize the conductor/ directory structure with all required artifact files",
         args: {},
         async execute(_args, context: ToolContext) {
-          // Import here to avoid circular dependency issues
           const { executeSetupCommand } = await import("./commands/setup.js");
           return executeSetupCommand({ client, $, directory, worktree }, context);
+        },
+      }),
+      "conductor:status": tool({
+        description: "Display an overall progress status for all tracks and tasks",
+        args: {},
+        async execute(_args, context: ToolContext) {
+          const { executeStatusCommand } = await import("./commands/status.js");
+          return executeStatusCommand({ client, directory }, context);
         },
       }),
     },

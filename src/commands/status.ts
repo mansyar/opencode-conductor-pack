@@ -9,7 +9,7 @@ import {
   PlanProgress 
 } from "../utils/parser";
 
-export async function executeStatusCommand(input: { client: any, directory: string }, context: ToolContext): Promise<void> {
+export async function executeStatusCommand(input: { client: any, directory: string }, context: ToolContext): Promise<string> {
   const { client } = input;
   const directory = input.directory || context.directory;
   const registryPath = path.join(directory, "conductor", "tracks.md");
@@ -52,12 +52,15 @@ export async function executeStatusCommand(input: { client: any, directory: stri
     // 3. Append to prompt
     await client.tui.appendPrompt(summaryMarkdown);
 
+    return `[CONDUCTOR] Status summary generated (${overallPercentage}%)`;
+
   } catch (error: any) {
     await client.tui.showToast({
       variant: "error",
       title: "Status Command Failed",
       message: error.message
     });
+    return `[CONDUCTOR] Failed to generate status: ${error.message}`;
   }
 }
 
