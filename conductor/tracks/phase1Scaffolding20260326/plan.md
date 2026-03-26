@@ -2,24 +2,24 @@
 
 ## Phase 1: Project Setup
 
-- [~] Task: Initialize TypeScript project with Vite and Vitest
-    - [ ] Initialize npm project with package.json
-    - [ ] Install TypeScript, Vite, Vitest, @types/node
+- [ ] Task: Initialize TypeScript project with Vite and Vitest
+    - [ ] Initialize project with pnpm and package.json
+    - [ ] Install TypeScript, Vite, Vitest, @types/node using pnpm
     - [ ] Create tsconfig.json with strict settings
     - [ ] Create vite.config.ts
     - [ ] Create basic test setup with Vitest
-    - [ ] Verify build and test commands work
+    - [ ] Verify build and test commands work with pnpm
 
 - [ ] Task: Create OpenCode plugin entry point structure
-    - [ ] Create src/index.ts as plugin entry
+    - [ ] Create src/index.ts as plugin entry (exports ConductorPlugin)
     - [ ] Create src/commands/ directory
-    - [ ] Set up basic plugin API integration
+    - [ ] Set up basic plugin API integration using @opencode-ai/plugin
     - [ ] Verify plugin loads in OpenCode
 
 - [ ] Task: Implement path isolation utilities
     - [ ] Create src/utils/path.ts
-    - [ ] Implement getProjectRoot() using process.cwd()
-    - [ ] Implement resolveConductorPath() helper
+    - [ ] Implement getProjectRoot() using OpenCode's directory context
+    - [ ] Implement resolveConductorPath() helper using directory
     - [ ] Write unit tests for path utilities
     - [ ] Verify >80% coverage on path utils
 
@@ -31,10 +31,11 @@
 
 - [ ] Task: Create /conductor:setup command handler
     - [ ] Create src/commands/setup.ts
+    - [ ] Create custom tool using tool() helper from @opencode-ai/plugin
     - [ ] Check if conductor/ already exists
-    - [ ] Validate Node.js environment
+    - [ ] Validate Bun availability (for OpenCode runtime)
     - [ ] Create conductor/ directory structure
-    - [ ] Write success message with created files
+    - [ ] Write success message with created files using tui.toast.show
 
 - [ ] Task: Implement template generation system
     - [ ] Create src/artifacts/templates.ts
@@ -69,16 +70,16 @@
 ## Phase 3: Documentation & Polish
 
 - [ ] Task: Update README.md with setup instructions
-    - [ ] Add installation instructions
+    - [ ] Add installation instructions (pnpm)
     - [ ] Add /conductor:setup usage example
-    - [ ] Add requirements (Node.js version)
+    - [ ] Add requirements (Bun for runtime, pnpm for dev)
     - [ ] Add troubleshooting section
 
 - [ ] Task: Final verification and cleanup
-    - [ ] Run full test suite
+    - [ ] Run full test suite with pnpm test
     - [ ] Verify coverage >80%
     - [ ] Check linting passes
-    - [ ] Build production bundle
+    - [ ] Build production bundle with pnpm build
 
 - [ ] Task: Create checkpoint commit
     - [ ] Stage all changes
