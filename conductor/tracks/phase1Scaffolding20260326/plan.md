@@ -23,39 +23,39 @@
     - [x] Write unit tests for path utilities
     - [x] Verify >80% coverage on path utils (89.79%)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Setup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Project Setup' (Protocol in workflow.md)
 
 ---
 
 ## Phase 2: Setup Command Implementation
 
-- [ ] Task: Create /conductor:setup command handler
-    - [ ] Create src/commands/setup.ts
-    - [ ] Create custom tool using tool() helper from @opencode-ai/plugin
-    - [ ] Check if conductor/ already exists
-    - [ ] Validate Bun availability (for OpenCode runtime)
-    - [ ] Create conductor/ directory structure
-    - [ ] Write success message with created files using tui.toast.show
+- [x] Task: Create /conductor:setup command handler
+    - [x] Create src/commands/setup.ts
+    - [x] Create custom tool using tool() helper from @opencode-ai/plugin
+    - [x] Check if conductor/ already exists
+    - [x] Validate Bun availability (for OpenCode runtime) - Note: Bun is guaranteed by OpenCode runtime
+    - [x] Create conductor/ directory structure
+    - [x] Write success message with created files (returns string for display)
 
-- [ ] Task: Implement template generation system
-    - [ ] Create src/artifacts/templates.ts
-    - [ ] Define product.md template
-    - [ ] Define product-guidelines.md template
-    - [ ] Define tech-stack.md template
-    - [ ] Define workflow.md template
-    - [ ] Create template rendering function with placeholders
+- [x] Task: Implement template generation system
+    - [x] Create src/artifacts/templates.ts
+    - [x] Define product.md template
+    - [x] Define product-guidelines.md template
+    - [x] Define tech-stack.md template
+    - [x] Define workflow.md template (full workflow document)
+    - [x] Create template rendering function with placeholders
 
-- [ ] Task: Generate initial conductor files
-    - [ ] Generate product.md with basic structure
-    - [ ] Generate product-guidelines.md with defaults
-    - [ ] Generate tech-stack.md with placeholders
-    - [ ] Generate workflow.md with defaults
-    - [ ] Create code_styleguides/ directory
+- [x] Task: Generate initial conductor files
+    - [x] Generate product.md with basic structure
+    - [x] Generate product-guidelines.md with defaults
+    - [x] Generate tech-stack.md with placeholders
+    - [x] Generate workflow.md with defaults (full workflow)
+    - [x] Create code_styleguides/ directory
 
-- [ ] Task: Initialize tracks registry
-    - [ ] Create tracks.md with header
-    - [ ] Create tracks/ directory
-    - [ ] Verify all files are created correctly
+- [x] Task: Initialize tracks registry
+    - [x] Create tracks.md with header
+    - [x] Create tracks/ directory
+    - [x] Verify all files are created correctly
 
 - [ ] Task: Write integration tests for setup
     - [ ] Create integration tests for /conductor:setup
