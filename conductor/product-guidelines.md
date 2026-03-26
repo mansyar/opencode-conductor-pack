@@ -19,12 +19,12 @@
 
 ## 3. Naming Conventions
 
-**CamelCase** — Commands and track IDs use CamelCase.
+**snake_case** — Track IDs use lowercase and underscores. Commands use lowercase for consistency.
 
 | Element | Convention | Example |
 | :--- | :--- | :--- |
-| Commands | `/conductor:newTrack` | `/conductor:newTrack`, `/conductor:buildFeature` |
-| Track IDs | `shortNameYYYYMMDD` | `authFlow20260326`, `apiRefactor20260325` |
+| Commands | `/conductor:setup` | `/conductor:setup`, `/conductor:status` |
+| Track IDs | `short_name_YYYYMMDD` | `auth_flow_20260326`, `api_refactor_20260325` |
 | File Names | kebab-case | `product-guidelines.md`, `code-styleguides/` |
 
 ## 4. Error Handling
