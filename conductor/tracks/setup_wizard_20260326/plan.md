@@ -3,7 +3,7 @@
 This plan refactors the `conductor:setup` command into a state-aware, interactive wizard using the OpenCode `question` tool.
 
 ## Phase 1: Infrastructure & State Management
-- [ ] Task: Create `src/utils/state.ts` for `setup_state.json` management.
+- [x] Task: Create `src/utils/state.ts` for `setup_state.json` management. [aca0ebc]
     - [ ] Define `SetupState` interface and step enums.
     - [ ] Implement `readState`, `writeState`, and `updateStep` utilities.
 - [ ] Task: Create `src/utils/discovery.ts` for project analysis.
