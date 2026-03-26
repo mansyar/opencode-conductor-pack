@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
 import { getProjectMaturity, inferTechStack } from "../utils/discovery.js";
+import { getStyleGuideLibrary } from "../artifacts/templates.js";
 
 /**
  * Executes the /conductor:setup command
@@ -227,7 +228,38 @@ ${a["3"] || "_File Structure_"}
         break;
 
       case SetupStep.STYLE_GUIDES:
-        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 2 Task 3 to continue.`;
+        const library = getStyleGuideLibrary();
+        const styleGuideSelection = await client.tool.execute("question", {
+          questions: [{
+            header: "Style Guides",
+            question: "Select the code style guides you would like to include in your project.",
+            type: "choice",
+            multiSelect: true,
+            options: library.map(guide => ({
+              label: guide.filename,
+              description: `Include ${guide.filename} in your project`
+            }))
+          }]
+        });
+
+        const selectedFiles = styleGuideSelection?.answers?.["0"] || [];
+        const styleGuidesDir = path.join(directory, "conductor", "code_styleguides");
+        if (!fs.existsSync(styleGuidesDir)) {
+          fs.mkdirSync(styleGuidesDir, { recursive: true });
+        }
+
+        for (const filename of selectedFiles) {
+          const guide = library.find(g => g.filename === filename);
+          if (guide) {
+            fs.writeFileSync(path.join(styleGuidesDir, guide.filename), guide.content, "utf-8");
+          }
+        }
+
+        state = updateStep(directory, SetupStep.SCAFFOLDING);
+        break;
+
+      case SetupStep.SCAFFOLDING:
+        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 to continue.`;
 
       default:
         return `[ERROR] Unknown setup step: ${state.currentStep}`;

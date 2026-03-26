@@ -41,20 +41,20 @@ describe("setup command", () => {
   });
 
   describe("executeSetupCommand", () => {
-    it("should initialize discovery and move to product step", async () => {
+    it("should initialize discovery and move through product, guidelines, and tech stack to style guides", async () => {
       const context = createMockContext(testDir);
       const client = createMockClient();
       
-      // Mock productMode question
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } });
-      // Mock next step to avoid further calls in this test
+      // Mock all steps
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } }); // productMode
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // productAnswers
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelinesMode
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techStackMode
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md"] } }); // styleGuides
       
       const result = await executeSetupCommand(client as any, context as any);
 
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
     });
 
     it("should ask to resume if state exists", async () => {
@@ -70,19 +70,18 @@ describe("setup command", () => {
         data: {}
       }));
 
-      // Mock "Yes" to resume
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Yes" } });
-      // Mock product questions
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } });
-      client.tool.execute.mockResolvedValueOnce({ answers: {} });
-      // Mock next steps
+      // Mock all steps from product onwards
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Yes" } }); // Resume
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } }); // productMode
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // productAnswers
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
     });
 
     it("should restart from discovery if user chooses not to resume", async () => {
@@ -98,22 +97,22 @@ describe("setup command", () => {
         data: {}
       }));
 
-      // Mock "No" to resume
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "No" } });
-      // Mock questions after restart
+      // Mock all steps after choosing not to resume
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "No" } }); // Resume
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } }); // productMode
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // productAnswers
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
       
       const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
-      expect(state.currentStep).toBe("style_guides");
-      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack"]);
+      expect(state.currentStep).toBe("scaffolding");
+      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides"]);
     });
 
     it("should generate product.md using interactive questions", async () => {
@@ -123,7 +122,7 @@ describe("setup command", () => {
       // Mock maturity to skip resume check
       fs.mkdirSync(conductorDir, { recursive: true });
 
-      // Mock questions for product.md
+      // Mock all steps
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } }); // Mode
       client.tool.execute.mockResolvedValueOnce({ 
         answers: { 
@@ -135,13 +134,13 @@ describe("setup command", () => {
           "5": "Stack"
         } 
       });
-      // Mock next steps
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -155,26 +154,25 @@ describe("setup command", () => {
       
       fs.mkdirSync(conductorDir, { recursive: true });
 
-      // Mock "Autogenerate"
+      // Mock all steps
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
-      // Mock next steps
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
       expect(content).toContain("# Inferred Product Name");
     });
 
-    it("should generate guidelines and tech-stack for brownfield project", async () => {
+    it("should generate guidelines, tech-stack and style guides for brownfield project", async () => {
       const context = createMockContext(testDir);
       const client = createMockClient();
       
-      // Ensure testDir exists
       if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
       
       // Mock brownfield project
@@ -190,16 +188,19 @@ describe("setup command", () => {
         data: {}
       }));
 
-      // Mock GUIDELINES: Autogenerate
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
-      // Mock TECH_STACK: Autogenerate
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
+      // Mock all steps from GUIDELINES
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Yes" } }); // Resume
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md", "general.md"] } }); // styleguides
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: style_guides");
+      expect(result).toContain("Setup paused at step: scaffolding");
       expect(fs.existsSync(path.join(conductorDir, "product-guidelines.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tech-stack.md"))).toBe(true);
+      expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "typescript.md"))).toBe(true);
+      expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "general.md"))).toBe(true);
       
       const tsContent = fs.readFileSync(path.join(conductorDir, "tech-stack.md"), "utf-8");
       expect(tsContent).toContain("TypeScript/JavaScript");
