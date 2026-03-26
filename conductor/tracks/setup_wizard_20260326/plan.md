@@ -9,7 +9,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Create `src/utils/discovery.ts` for project analysis. [3591903]
     - [ ] Implement `getProjectMaturity` (Brownfield vs. Greenfield indicators).
     - [ ] Implement a safe, `.gitignore`-aware file scanner for context extraction.
-- [ ] Task: Refactor `src/commands/setup.ts` entry point.
+- [x] Task: Refactor `src/commands/setup.ts` entry point. [6a5ab40]
     - [ ] Update `executeSetupCommand` signature to accept the SDK `client`.
     - [ ] Implement the top-level orchestration loop (Resume -> Discovery -> Phase execution).
 - [ ] Task: Conductor - User Manual Verification 'Infrastructure & State Management' (Protocol in workflow.md)
