@@ -16,12 +16,12 @@
     - [x] Set up basic plugin API integration using @opencode-ai/plugin
     - [x] Verify plugin loads in OpenCode
 
-- [ ] Task: Implement path isolation utilities
-    - [ ] Create src/utils/path.ts
-    - [ ] Implement getProjectRoot() using OpenCode's directory context
-    - [ ] Implement resolveConductorPath() helper using directory
-    - [ ] Write unit tests for path utilities
-    - [ ] Verify >80% coverage on path utils
+- [x] Task: Implement path isolation utilities
+    - [x] Create src/utils/path.ts
+    - [x] Implement getProjectRoot() using OpenCode's directory context
+    - [x] Implement resolveConductorPath() helper using directory
+    - [x] Write unit tests for path utilities
+    - [x] Verify >80% coverage on path utils (89.79%)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Setup' (Protocol in workflow.md)
 

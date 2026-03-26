@@ -13,6 +13,7 @@ export default defineConfig({
     }
   },
   build: {
+    target: "node20",
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "ConductorPlugin",
@@ -20,12 +21,26 @@ export default defineConfig({
       fileName: "index"
     },
     rollupOptions: {
-      external: ["@opencode-ai/plugin", "@opencode-ai/sdk"],
+      external: [
+        "fs",
+        "path",
+        "os",
+        "url",
+        "util",
+        "events",
+        "stream",
+        "crypto",
+        "buffer",
+        "process",
+        "@opencode-ai/plugin",
+        "@opencode-ai/sdk"
+      ],
       output: {
         globals: {
           "@opencode-ai/plugin": "Plugin",
           "@opencode-ai/sdk": "SDK"
-        }
+        },
+        format: "es"
       }
     }
   }
