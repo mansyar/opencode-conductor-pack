@@ -26,7 +26,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Conductor - User Manual Verification 'Interactive Dialogue & Artifact Generation' (Protocol in workflow.md)
 
 ## Phase 3: Tracks & Scaffolding
-- [ ] Task: Create the `conductor/index.md` context hub.
+- [x] Task: Create the `conductor/index.md` context hub. [fdbf5b8]
 - [ ] Task: Implement the Initial Track Scaffolder.
     - [ ] Logic to propose a track title based on product definition.
     - [ ] Automated generation of `spec.md`, phased `plan.md`, and `metadata.json`.
