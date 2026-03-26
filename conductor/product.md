@@ -58,3 +58,10 @@ The plugin is built on:
 - **Plugin API:** `@opencode-ai/plugin` for hooks, custom tools, and events
 - **SDK:** `@opencode-ai/sdk` for server interaction
 - **Bun:** Package management (as required by OpenCode)
+
+
+## 7. References
+
+- [OpenCode Plugin API](https://opencode.ai/docs/plugins)
+- [OpenCode SDK](https://opencode.ai/docs/sdk)
+- [OpenCode Plugin Examples](https://opencode.ai/docs/plugins/#examples)
