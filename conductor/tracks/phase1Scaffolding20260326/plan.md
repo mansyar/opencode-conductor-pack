@@ -63,23 +63,23 @@
     - [x] Test complete file generation
     - [x] Verify >80% coverage overall (93.17%)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Setup Command Implementation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Setup Command Implementation' (Protocol in workflow.md)
 
 ---
 
 ## Phase 3: Documentation & Polish
 
-- [ ] Task: Update README.md with setup instructions
-    - [ ] Add installation instructions (pnpm)
-    - [ ] Add /conductor:setup usage example
-    - [ ] Add requirements (Bun for runtime, pnpm for dev)
-    - [ ] Add troubleshooting section
+- [x] Task: Update README.md with setup instructions
+    - [x] Add installation instructions (pnpm)
+    - [x] Add /conductor:setup usage example
+    - [x] Add requirements (Bun for runtime, pnpm for dev)
+    - [x] Add troubleshooting section
 
-- [ ] Task: Final verification and cleanup
-    - [ ] Run full test suite with pnpm test
-    - [ ] Verify coverage >80%
-    - [ ] Check linting passes
-    - [ ] Build production bundle with pnpm build
+- [x] Task: Final verification and cleanup
+    - [x] Run full test suite with pnpm test (18 tests pass)
+    - [x] Verify coverage >80% (93.17%)
+    - [x] Check linting passes (no lint configured yet)
+    - [x] Build production bundle with pnpm build
 
 - [ ] Task: Create checkpoint commit
     - [ ] Stage all changes
