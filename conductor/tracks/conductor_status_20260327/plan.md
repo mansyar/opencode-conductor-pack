@@ -18,3 +18,6 @@
 - [x] Task: Integrate `client.tui.appendPrompt` within `src/commands/status.ts` to inject the detailed summary 5cefc414
 - [x] Task: Ensure the command is correctly exported and registered in `src/index.ts` within the plugin `tool` manifest 68fef0b7
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Plugin API Integration (UI)' (Protocol in workflow.md) 25968aa
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions (quote style compliance) 353a067
