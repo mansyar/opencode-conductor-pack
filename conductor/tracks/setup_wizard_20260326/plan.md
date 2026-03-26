@@ -6,7 +6,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Create `src/utils/state.ts` for `setup_state.json` management. [aca0ebc]
     - [ ] Define `SetupState` interface and step enums.
     - [ ] Implement `readState`, `writeState`, and `updateStep` utilities.
-- [ ] Task: Create `src/utils/discovery.ts` for project analysis.
+- [x] Task: Create `src/utils/discovery.ts` for project analysis. [3591903]
     - [ ] Implement `getProjectMaturity` (Brownfield vs. Greenfield indicators).
     - [ ] Implement a safe, `.gitignore`-aware file scanner for context extraction.
 - [ ] Task: Refactor `src/commands/setup.ts` entry point.
