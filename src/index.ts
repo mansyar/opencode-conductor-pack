@@ -8,6 +8,7 @@ import type { Plugin } from "@opencode-ai/plugin";
  * functionality for initializing the conductor/ directory structure.
  */
 export const ConductorPlugin: Plugin = async (input) => {
+  const { client } = input;
   return {
     tool: {
       "conductor:setup": tool({
@@ -16,7 +17,7 @@ export const ConductorPlugin: Plugin = async (input) => {
         async execute(_args, context: ToolContext) {
           // Import here to avoid circular dependency issues
           const { executeSetupCommand } = await import("./commands/setup.js");
-          return executeSetupCommand(context);
+          return executeSetupCommand(client, context);
         },
       }),
     },

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import { executeSetupCommand } from "../src/commands/setup";
@@ -13,6 +13,13 @@ const createMockContext = (directory: string) => ({
   abort: new AbortController().signal,
   metadata: () => {},
   ask: async () => {},
+});
+
+// Mock Client
+const createMockClient = () => ({
+  tool: {
+    execute: vi.fn(),
+  },
 });
 
 describe("setup command", () => {
@@ -34,122 +41,67 @@ describe("setup command", () => {
   });
 
   describe("executeSetupCommand", () => {
-    it("should create conductor directory structure", async () => {
+    it("should initialize discovery and move to product step", async () => {
       const context = createMockContext(testDir);
-      await executeSetupCommand(context);
+      const client = createMockClient();
+      const result = await executeSetupCommand(client as any, context as any);
 
-      expect(fs.existsSync(conductorDir)).toBe(true);
-      expect(fs.existsSync(path.join(conductorDir, "code_styleguides"))).toBe(true);
-      expect(fs.existsSync(path.join(conductorDir, "tracks"))).toBe(true);
+      expect(result).toContain("Setup paused at step: product");
+      expect(fs.existsSync(path.join(conductorDir, "setup_state.json"))).toBe(true);
+      
+      const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
+      expect(state.currentStep).toBe("product");
+      expect(state.completedSteps).toContain("discovery");
     });
 
-    it("should create all required files", async () => {
+    it("should ask to resume if state exists", async () => {
       const context = createMockContext(testDir);
-      await executeSetupCommand(context);
+      const client = createMockClient();
+      
+      // Pre-create state
+      fs.mkdirSync(conductorDir, { recursive: true });
+      fs.writeFileSync(path.join(conductorDir, "setup_state.json"), JSON.stringify({
+        currentStep: "product",
+        maturity: "greenfield",
+        completedSteps: ["discovery"],
+        data: {}
+      }));
 
-      const expectedFiles = [
-        "product.md",
-        "product-guidelines.md",
-        "tech-stack.md",
-        "workflow.md",
-        "tracks.md",
-      ];
+      // Mock "Yes" to resume
+      client.tool.execute.mockResolvedValue({ answers: { "0": "Yes" } });
 
-      for (const file of expectedFiles) {
-        const filePath = path.join(conductorDir, file);
-        expect(fs.existsSync(filePath), `File ${file} should exist`).toBe(true);
-      }
+      const result = await executeSetupCommand(client as any, context as any);
+      
+      expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
+      expect(result).toContain("Setup paused at step: product");
     });
 
-    it("should return success message with created files", async () => {
+    it("should restart from discovery if user chooses not to resume", async () => {
       const context = createMockContext(testDir);
-      const result = await executeSetupCommand(context);
+      const client = createMockClient();
+      
+      // Pre-create state at product step
+      fs.mkdirSync(conductorDir, { recursive: true });
+      fs.writeFileSync(path.join(conductorDir, "setup_state.json"), JSON.stringify({
+        currentStep: "product",
+        maturity: "greenfield",
+        completedSteps: ["discovery"],
+        data: {}
+      }));
 
-      expect(result).toContain("[CONDUCTOR] Initialized conductor/ structure");
-      expect(result).toContain("✓ Created conductor/product.md");
-      expect(result).toContain("✓ Created conductor/product-guidelines.md");
-      expect(result).toContain("✓ Created conductor/tech-stack.md");
-      expect(result).toContain("✓ Created conductor/workflow.md");
-      expect(result).toContain("✓ Created conductor/code_styleguides/");
-      expect(result).toContain("✓ Created conductor/tracks.md");
-      expect(result).toContain("✓ Created conductor/tracks/");
-    });
+      // Mock "No" to resume
+      client.tool.execute.mockResolvedValue({ answers: { "0": "No" } });
 
-    it("should be idempotent - fail if conductor already exists", async () => {
-      const context = createMockContext(testDir);
-
-      // First setup
-      await executeSetupCommand(context);
-
-      // Second setup should fail
-      const result = await executeSetupCommand(context);
-      expect(result).toBe(`[ERROR] Setup: Directory already exists
-
-Context: The 'conductor/' directory was found in the project root.
-Expected: 'conductor/' should not exist before running setup.
-Suggestion: Remove the 'conductor/' directory first if you want to re-initialize.`);
-    });
-
-    it("should create workflow.md with full content", async () => {
-      const context = createMockContext(testDir);
-      await executeSetupCommand(context);
-
-      const workflowPath = path.join(conductorDir, "workflow.md");
-      const content = fs.readFileSync(workflowPath, "utf-8");
-
-      // Check for key sections in the full workflow
-      expect(content).toContain("# Project Workflow");
-      expect(content).toContain("## Guiding Principles");
-      expect(content).toContain("## Task Workflow");
-      expect(content).toContain("## Quality Gates");
-      expect(content).toContain("## Testing Requirements");
-      expect(content).toContain("## Commit Guidelines");
-      expect(content).toContain("## Definition of Done");
-    });
-
-    it("should create product.md with placeholder content", async () => {
-      const context = createMockContext(testDir);
-      await executeSetupCommand(context);
-
-      const productPath = path.join(conductorDir, "product.md");
-      const content = fs.readFileSync(productPath, "utf-8");
-
-      expect(content).toContain("# Product Name");
-      expect(content).toContain("## Vision & Goals");
-      expect(content).toContain("## Target Users");
-      expect(content).toContain("## Core Features");
-      expect(content).toContain("## Success Metrics");
-      expect(content).toContain("## Technical Foundation");
-    });
-
-    it("should create tracks.md with header", async () => {
-      const context = createMockContext(testDir);
-      await executeSetupCommand(context);
-
-      const tracksPath = path.join(conductorDir, "tracks.md");
-      const content = fs.readFileSync(tracksPath, "utf-8");
-
-      expect(content).toContain("# Project Tracks");
-      expect(content).toContain("This file tracks all major tracks for the project");
-      expect(content).toContain("---");
-    });
-
-    it("should create code_styleguides directory", async () => {
-      const context = createMockContext(testDir);
-      await executeSetupCommand(context);
-
-      const codeStyleguidesDir = path.join(conductorDir, "code_styleguides");
-      expect(fs.existsSync(codeStyleguidesDir)).toBe(true);
-      expect(fs.statSync(codeStyleguidesDir).isDirectory()).toBe(true);
-    });
-
-    it("should create tracks directory", async () => {
-      const context = createMockContext(testDir);
-      await executeSetupCommand(context);
-
-      const tracksDir = path.join(conductorDir, "tracks");
-      expect(fs.existsSync(tracksDir)).toBe(true);
-      expect(fs.statSync(tracksDir).isDirectory()).toBe(true);
+      const result = await executeSetupCommand(client as any, context as any);
+      
+      expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
+      // Should have restarted and moved back to product from discovery
+      expect(result).toContain("Setup paused at step: product");
+      
+      const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
+      expect(state.currentStep).toBe("product");
+      // Completed steps should just be discovery (re-run)
+      expect(state.completedSteps).toEqual(["discovery"]);
     });
   });
 });

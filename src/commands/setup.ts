@@ -1,52 +1,57 @@
 import type { ToolContext } from "@opencode-ai/plugin";
-import * as fs from "fs";
-import * as path from "path";
-import { getConductorTemplates } from "../artifacts/templates.js";
+import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
+import { getProjectMaturity } from "../utils/discovery.js";
 
 /**
  * Executes the /conductor:setup command
- * Initializes the conductor/ directory structure with all required artifact files
- * 
- * Note: OpenCode requires Bun runtime, so Bun availability is guaranteed.
- * This function assumes the OpenCode environment is properly set up.
+ * Refactored into a stateful, interactive wizard.
  */
-export async function executeSetupCommand(context: ToolContext): Promise<string> {
-  const conductorDir = path.join(context.directory, "conductor");
+export async function executeSetupCommand(client: any, context: ToolContext): Promise<string> {
+  const directory = context.directory;
+  let state = readState(directory);
 
-  // Check if conductor/ already exists
-  if (fs.existsSync(conductorDir)) {
-    return `[ERROR] Setup: Directory already exists
-
-Context: The 'conductor/' directory was found in the project root.
-Expected: 'conductor/' should not exist before running setup.
-Suggestion: Remove the 'conductor/' directory first if you want to re-initialize.`;
+  if (state && state.currentStep !== SetupStep.COMPLETE) {
+    // Ask to resume
+    const response = await client.tool.execute("question", {
+      questions: [{
+        header: "Resume",
+        question: `I found an existing setup in progress (Step: ${state.currentStep}). Would you like to resume?`,
+        type: "yesno"
+      }]
+    });
+    
+    if (response?.answers?.["0"] === "No") {
+      state = null;
+    }
   }
 
-  // Create directory structure
-  const dirsToCreate = [
-    conductorDir,
-    path.join(conductorDir, "code_styleguides"),
-    path.join(conductorDir, "tracks"),
-  ];
-
-  for (const dir of dirsToCreate) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (!state) {
+    // Start from discovery
+    const maturity = getProjectMaturity(directory);
+    state = {
+      currentStep: SetupStep.DISCOVERY,
+      maturity,
+      completedSteps: [],
+      data: {}
+    };
+    writeState(directory, state);
   }
 
-  // Get templates and create files
-  const filesToCreate = getConductorTemplates();
+  // Orchestration Loop
+  while (state.currentStep !== SetupStep.COMPLETE) {
+    switch (state.currentStep) {
+      case SetupStep.DISCOVERY:
+        state = updateStep(directory, SetupStep.PRODUCT);
+        break;
+      
+      case SetupStep.PRODUCT:
+        // Implementation for Phase 2
+        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 2 to continue.`;
 
-  for (const file of filesToCreate) {
-    const filePath = path.join(conductorDir, file.filename);
-    fs.writeFileSync(filePath, file.content, "utf-8");
+      default:
+        return `[ERROR] Unknown setup step: ${state.currentStep}`;
+    }
   }
 
-  return `[CONDUCTOR] Initialized conductor/ structure
-  ✓ Created conductor/product.md
-  ✓ Created conductor/product-guidelines.md
-  ✓ Created conductor/tech-stack.md
-  ✓ Created conductor/workflow.md
-  ✓ Created conductor/code_styleguides/
-  ✓ Created conductor/tracks.md
-  ✓ Created conductor/tracks/`;
+  return "[CONDUCTOR] Setup complete!";
 }
