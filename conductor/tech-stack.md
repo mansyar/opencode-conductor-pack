@@ -25,7 +25,7 @@ export const ConductorPlugin: Plugin = async ({ project, directory, worktree, cl
 | `directory` | Current working directory (project root) |
 | `worktree` | Git worktree path |
 | `client` | OpenCode SDK client for AI interaction |
-| `$` | Bun's shell API for executing commands |
+| `$` | Bun's shell API for executing commands (via `bun shell`) |
 
 ### Events Available
 - **Tool Events:** `tool.execute.before`, `tool.execute.after`
@@ -36,16 +36,17 @@ export const ConductorPlugin: Plugin = async ({ project, directory, worktree, cl
 
 ## 3. Package Management
 
-**Bun** — OpenCode uses Bun for plugin dependency installation. Plugins declare dependencies in a `package.json` within the config directory.
+**pnpm** — Fast, disk space efficient package manager. While OpenCode uses Bun internally, this plugin project uses pnpm for development and dependency management.
 
-```json
-{
-  "dependencies": {
-    "@opencode-ai/plugin": "latest",
-    "@opencode-ai/sdk": "latest"
-  }
-}
+```bash
+# Install dependencies
+pnpm install
+
+# Add a dependency
+pnpm add @opencode-ai/plugin
 ```
+
+**Note:** OpenCode plugins are loaded via `.opencode/package.json` which OpenCode processes with Bun at startup. For local development, use pnpm; ensure the `.opencode/package.json` reflects the correct dependencies for runtime.
 
 ## 4. Dependencies
 

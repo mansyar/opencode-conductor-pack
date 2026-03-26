@@ -2,7 +2,7 @@
 
 ## Phase 1: Project Setup
 
-- [ ] Task: Initialize TypeScript project with Vite and Vitest
+- [~] Task: Initialize TypeScript project with Vite and Vitest
     - [ ] Initialize npm project with package.json
     - [ ] Install TypeScript, Vite, Vitest, @types/node
     - [ ] Create tsconfig.json with strict settings
