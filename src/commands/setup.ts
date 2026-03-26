@@ -2,8 +2,8 @@ import type { ToolContext } from "@opencode-ai/plugin";
 import * as fs from "fs";
 import * as path from "path";
 import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
-import { getProjectMaturity, inferTechStack } from "../utils/discovery.js";
-import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTemplate } from "../artifacts/templates.js";
+import { getProjectMaturity, inferTechStack, proposeInitialTrack } from "../utils/discovery.js";
+import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTemplate, trackSpecTemplate, trackPlanTemplate, trackMetadataTemplate } from "../artifacts/templates.js";
 
 /**
  * Executes the /conductor:setup command
@@ -276,7 +276,60 @@ ${a["3"] || "_File Structure_"}
         break;
 
       case SetupStep.TRACKS:
-        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 Task 2 to continue.`;
+        const suggestedTitle = proposeInitialTrack(directory);
+        const trackDetails = await client.tool.execute("question", {
+          questions: [
+            { header: "Initial Track", question: "What is the title of the first track you would like to implement?", type: "text", placeholder: suggestedTitle },
+            { header: "Description", question: "Provide a brief description of this track.", type: "text" },
+            { header: "Initial Task", question: "What is the first task for this track?", type: "text", placeholder: "Set up project structure" },
+          ]
+        });
+
+        const td = trackDetails?.answers || {};
+        const trackTitle = td["0"] || "Initial Track";
+        const trackDesc = td["1"] || "First implementation track";
+        const firstTask = td["2"] || "Initial project setup";
+        
+        // Generate Track ID
+        const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const trackId = `${trackTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${dateStr}`;
+        const trackPath = path.join(directory, "conductor", "tracks", trackId);
+        
+        fs.mkdirSync(trackPath, { recursive: true });
+
+        // Fill templates
+        const spec = trackSpecTemplate
+          .replace(/{{track_title}}/g, trackTitle)
+          .replace(/{{track_description}}/g, trackDesc)
+          .replace(/{{feature_goal}}/g, trackTitle.toLowerCase())
+          .replace(/{{requirement_1}}/g, "Requirement 1")
+          .replace(/{{technical_design}}/g, "Design details...");
+
+        const plan = trackPlanTemplate
+          .replace(/{{track_title}}/g, trackTitle)
+          .replace(/{{initial_task}}/g, firstTask);
+
+        const metadata = trackMetadataTemplate
+          .replace(/{{track_id}}/g, trackId)
+          .replace(/{{track_title}}/g, trackTitle)
+          .replace(/{{track_description}}/g, trackDesc)
+          .replace(/{{created_date}}/g, new Date().toISOString());
+
+        fs.writeFileSync(path.join(trackPath, "spec.md"), spec, "utf-8");
+        fs.writeFileSync(path.join(trackPath, "plan.md"), plan, "utf-8");
+        fs.writeFileSync(path.join(trackPath, "metadata.json"), metadata, "utf-8");
+        fs.writeFileSync(path.join(trackPath, "index.md"), `# Track Index: ${trackTitle}\n\n[Specification](./spec.md)\n[Implementation Plan](./plan.md)\n`, "utf-8");
+
+        // Update tracks registry
+        const tracksRegistryPath = path.join(directory, "conductor", "tracks.md");
+        const trackEntry = `\n- [ ] **Track: ${trackTitle}**\n      *Link: [./tracks/${trackId}/](./tracks/${trackId}/)*\n`;
+        fs.appendFileSync(tracksRegistryPath, trackEntry, "utf-8");
+
+        state = updateStep(directory, SetupStep.GIT);
+        break;
+
+      case SetupStep.GIT:
+        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 Task 3 to continue.`;
 
       default:
         return `[ERROR] Unknown setup step: ${state.currentStep}`;

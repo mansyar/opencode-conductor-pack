@@ -123,3 +123,29 @@ export function inferTechStack(directory: string): Record<string, string> {
 
   return stack;
 }
+/**
+ * Propose an initial track name based on product definition
+ */
+export function proposeInitialTrack(directory: string): string {
+  const defaultTrack = "Build core functionality";
+  const productPath = path.join(directory, "conductor", "product.md");
+
+  if (!fs.existsSync(productPath)) {
+    return defaultTrack;
+  }
+
+  try {
+    const content = fs.readFileSync(productPath, "utf-8");
+    // Look for Phase 1 feature name: ### Phase 1: Feature Name
+    const phase1Match = content.match(/### Phase 1:\s*(.*)/i);
+    if (phase1Match && phase1Match[1]) {
+      const name = phase1Match[1].trim();
+      // Remove any trailing markdown markers if present
+      return name.replace(/_$/, "").replace(/^_/, "").trim() || defaultTrack;
+    }
+  } catch (e) {
+    // Fallback if file read fails
+  }
+
+  return defaultTrack;
+}
