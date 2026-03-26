@@ -32,7 +32,7 @@ Built on OpenCode's native **Plugin API**, it integrates seamlessly with the too
 - **TDD Enforcement:** Requires test coverage before allowing implementation in specific directories
 
 ### Phase 4: Integration & Polish
-- **TUI Status Bar:** Uses `tui.toast.show` and `tui.prompt.append` for "Current Task" visual indicators
+- **TUI Status Bar:** `/conductor:status` uses `tui.toast.show` and `tui.prompt.append` for "Current Task" and overall progress visual indicators
 - **Git Integration:** `/conductor:commit` auto-generates messages from completed `plan.md` tasks
 - **Session Hooks:** Uses `session.idle`, `session.compacted` events for workflow automation
 
