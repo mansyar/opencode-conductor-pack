@@ -2,7 +2,7 @@
 
 This plan refactors the `conductor:setup` command into a state-aware, interactive wizard using the OpenCode `question` tool.
 
-## Phase 1: Infrastructure & State Management
+## Phase 1: Infrastructure & State Management [checkpoint: 2954478]
 - [x] Task: Create `src/utils/state.ts` for `setup_state.json` management. [aca0ebc]
     - [ ] Define `SetupState` interface and step enums.
     - [ ] Implement `readState`, `writeState`, and `updateStep` utilities.
@@ -12,7 +12,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Refactor `src/commands/setup.ts` entry point. [6a5ab40]
     - [ ] Update `executeSetupCommand` signature to accept the SDK `client`.
     - [ ] Implement the top-level orchestration loop (Resume -> Discovery -> Phase execution).
-- [ ] Task: Conductor - User Manual Verification 'Infrastructure & State Management' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Infrastructure & State Management' (Protocol in workflow.md)
 
 ## Phase 2: Interactive Dialogue & Artifact Generation
 - [ ] Task: Implement Interactive `product.md` generator.
