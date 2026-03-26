@@ -2,13 +2,13 @@
 
 ## Phase 1: Project Setup
 
-- [ ] Task: Initialize TypeScript project with Vite and Vitest
-    - [ ] Initialize project with pnpm and package.json
-    - [ ] Install TypeScript, Vite, Vitest, @types/node using pnpm
-    - [ ] Create tsconfig.json with strict settings
-    - [ ] Create vite.config.ts
-    - [ ] Create basic test setup with Vitest
-    - [ ] Verify build and test commands work with pnpm
+- [x] Task: Initialize TypeScript project with Vite and Vitest
+    - [x] Initialize project with pnpm and package.json
+    - [x] Install TypeScript, Vite, Vitest, @types/node using pnpm
+    - [x] Create tsconfig.json with strict settings
+    - [x] Create vite.config.ts
+    - [x] Create basic test setup with Vitest
+    - [x] Verify build and test commands work with pnpm
 
 - [ ] Task: Create OpenCode plugin entry point structure
     - [ ] Create src/index.ts as plugin entry (exports ConductorPlugin)
