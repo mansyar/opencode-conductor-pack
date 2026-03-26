@@ -97,3 +97,29 @@ export function scanProject(directory: string): string[] {
   walk(directory);
   return results;
 }
+
+/**
+ * Infer technology stack from project files
+ */
+export function inferTechStack(directory: string): Record<string, string> {
+  const stack: Record<string, string> = {
+    language: "Unknown",
+    architecture: "Modular",
+    packageManager: "Unknown",
+  };
+
+  if (fs.existsSync(path.join(directory, "package.json"))) {
+    stack.language = "TypeScript/JavaScript";
+    if (fs.existsSync(path.join(directory, "pnpm-lock.yaml"))) stack.packageManager = "pnpm";
+    else if (fs.existsSync(path.join(directory, "yarn.lock"))) stack.packageManager = "yarn";
+    else stack.packageManager = "npm";
+  } else if (fs.existsSync(path.join(directory, "requirements.txt")) || fs.existsSync(path.join(directory, "pyproject.toml"))) {
+    stack.language = "Python";
+    stack.packageManager = "pip/poetry";
+  } else if (fs.existsSync(path.join(directory, "go.mod"))) {
+    stack.language = "Go";
+    stack.packageManager = "go mod";
+  }
+
+  return stack;
+}

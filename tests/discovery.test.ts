@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
-import { getProjectMaturity, scanProject } from "../src/utils/discovery";
+import { getProjectMaturity, scanProject, inferTechStack } from "../src/utils/discovery";
 
 describe("project discovery", () => {
   const testDir = path.join(process.cwd(), "test-discovery-temp");
@@ -66,6 +66,35 @@ describe("project discovery", () => {
         fs.writeFileSync(filePath, "content");
         const files = scanProject(filePath);
         expect(files).toEqual([]);
+    });
+  });
+
+  describe("inferTechStack", () => {
+    it("should detect TypeScript/pnpm project", () => {
+      fs.writeFileSync(path.join(testDir, "package.json"), "{}");
+      fs.writeFileSync(path.join(testDir, "pnpm-lock.yaml"), "");
+      const stack = inferTechStack(testDir);
+      expect(stack.language).toBe("TypeScript/JavaScript");
+      expect(stack.packageManager).toBe("pnpm");
+    });
+
+    it("should detect Python project", () => {
+      fs.writeFileSync(path.join(testDir, "requirements.txt"), "");
+      const stack = inferTechStack(testDir);
+      expect(stack.language).toBe("Python");
+      expect(stack.packageManager).toBe("pip/poetry");
+    });
+
+    it("should detect Go project", () => {
+      fs.writeFileSync(path.join(testDir, "go.mod"), "");
+      const stack = inferTechStack(testDir);
+      expect(stack.language).toBe("Go");
+      expect(stack.packageManager).toBe("go mod");
+    });
+
+    it("should return Unknown for empty project", () => {
+      const stack = inferTechStack(testDir);
+      expect(stack.language).toBe("Unknown");
     });
   });
 });

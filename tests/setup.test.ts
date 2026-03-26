@@ -47,11 +47,14 @@ describe("setup command", () => {
       
       // Mock productMode question
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } });
+      // Mock next step to avoid further calls in this test
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // productAnswers
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelinesMode
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techStackMode
       
       const result = await executeSetupCommand(client as any, context as any);
 
-      // It should have completed discovery and be waiting at product questions
-      expect(result).toContain("Setup paused at step: guidelines"); // Actually it will proceed if we mock the next call too
+      expect(result).toContain("Setup paused at step: style_guides");
     });
 
     it("should ask to resume if state exists", async () => {
@@ -72,11 +75,14 @@ describe("setup command", () => {
       // Mock product questions
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } });
       client.tool.execute.mockResolvedValueOnce({ answers: {} });
+      // Mock next steps
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: guidelines");
+      expect(result).toContain("Setup paused at step: style_guides");
     });
 
     it("should restart from discovery if user chooses not to resume", async () => {
@@ -94,20 +100,20 @@ describe("setup command", () => {
 
       // Mock "No" to resume
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "No" } });
-      // Mock product questions after restart
-      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } });
-      client.tool.execute.mockResolvedValueOnce({ answers: {} });
+      // Mock questions after restart
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Interactive" } }); // productMode
+      client.tool.execute.mockResolvedValueOnce({ answers: {} }); // productAnswers
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
 
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      // Should have restarted and moved back to product from discovery and then to guidelines
-      expect(result).toContain("Setup paused at step: guidelines");
+      expect(result).toContain("Setup paused at step: style_guides");
       
       const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
-      expect(state.currentStep).toBe("guidelines");
-      // Completed steps should be discovery and product
-      expect(state.completedSteps).toEqual(["discovery", "product"]);
+      expect(state.currentStep).toBe("style_guides");
+      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack"]);
     });
 
     it("should generate product.md using interactive questions", async () => {
@@ -129,10 +135,13 @@ describe("setup command", () => {
           "5": "Stack"
         } 
       });
+      // Mock next steps
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: guidelines");
+      expect(result).toContain("Setup paused at step: style_guides");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -148,14 +157,53 @@ describe("setup command", () => {
 
       // Mock "Autogenerate"
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
+      // Mock next steps
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // guidelines
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } }); // techstack
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: guidelines");
+      expect(result).toContain("Setup paused at step: style_guides");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
       expect(content).toContain("# Inferred Product Name");
+    });
+
+    it("should generate guidelines and tech-stack for brownfield project", async () => {
+      const context = createMockContext(testDir);
+      const client = createMockClient();
+      
+      // Ensure testDir exists
+      if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
+      
+      // Mock brownfield project
+      fs.writeFileSync(path.join(testDir, "package.json"), "{}");
+      fs.writeFileSync(path.join(testDir, "pnpm-lock.yaml"), "");
+
+      // State: at GUIDELINES step
+      fs.mkdirSync(conductorDir, { recursive: true });
+      fs.writeFileSync(path.join(conductorDir, "setup_state.json"), JSON.stringify({
+        currentStep: "guidelines",
+        maturity: "brownfield",
+        completedSteps: ["discovery", "product"],
+        data: {}
+      }));
+
+      // Mock GUIDELINES: Autogenerate
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
+      // Mock TECH_STACK: Autogenerate
+      client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Autogenerate" } });
+
+      const result = await executeSetupCommand(client as any, context as any);
+      
+      expect(result).toContain("Setup paused at step: style_guides");
+      expect(fs.existsSync(path.join(conductorDir, "product-guidelines.md"))).toBe(true);
+      expect(fs.existsSync(path.join(conductorDir, "tech-stack.md"))).toBe(true);
+      
+      const tsContent = fs.readFileSync(path.join(conductorDir, "tech-stack.md"), "utf-8");
+      expect(tsContent).toContain("TypeScript/JavaScript");
+      expect(tsContent).toContain("pnpm");
     });
   });
 });
