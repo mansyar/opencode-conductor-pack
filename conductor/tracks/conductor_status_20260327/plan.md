@@ -13,8 +13,8 @@
 - [x] Task: Implement high-quality formatting function to construct the final output layout (Date/Time, Overall Status, Current Phase, Next Action, Blockers, Breakdown) for `client.tui.appendPrompt` 5cefc414
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Command Logic & Formatting' (Protocol in workflow.md) c6d0ee2
 
-## Phase 3: Plugin API Integration (UI)
+## Phase 3: Plugin API Integration (UI) [checkpoint: 25968aa]
 - [x] Task: Integrate `client.tui.showToast` within `src/commands/status.ts` for the high-level percentage summary summary 5cefc414
 - [x] Task: Integrate `client.tui.appendPrompt` within `src/commands/status.ts` to inject the detailed summary 5cefc414
 - [x] Task: Ensure the command is correctly exported and registered in `src/index.ts` within the plugin `tool` manifest 68fef0b7
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Plugin API Integration (UI)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Plugin API Integration (UI)' (Protocol in workflow.md) 25968aa
