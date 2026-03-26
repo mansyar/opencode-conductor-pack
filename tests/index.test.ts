@@ -7,12 +7,6 @@ describe("plugin entry point", () => {
     expect(typeof ConductorPlugin).toBe("function");
   });
 
-  it("should export plugin as default export", async () => {
-    const plugin = await import("../src/index");
-    expect(plugin.default).toBeDefined();
-    expect(typeof plugin.default).toBe("function");
-  });
-
   it("should have correct plugin structure", async () => {
     const { ConductorPlugin } = await import("../src/index");
     

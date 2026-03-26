@@ -22,6 +22,3 @@ export const ConductorPlugin: Plugin = async (input) => {
     },
   };
 };
-
-export { ConductorPlugin as default };
-export { ConductorPlugin as plugin };

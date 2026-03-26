@@ -15,7 +15,11 @@ export async function executeSetupCommand(context: ToolContext): Promise<string>
 
   // Check if conductor/ already exists
   if (fs.existsSync(conductorDir)) {
-    return `[ERROR] conductor/ already initialized. Remove it first to re-initialize.`;
+    return `[ERROR] Setup: Directory already exists
+
+Context: The 'conductor/' directory was found in the project root.
+Expected: 'conductor/' should not exist before running setup.
+Suggestion: Remove the 'conductor/' directory first if you want to re-initialize.`;
   }
 
   // Create directory structure

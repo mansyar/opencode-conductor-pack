@@ -83,7 +83,11 @@ describe("setup command", () => {
 
       // Second setup should fail
       const result = await executeSetupCommand(context);
-      expect(result).toBe("[ERROR] conductor/ already initialized. Remove it first to re-initialize.");
+      expect(result).toBe(`[ERROR] Setup: Directory already exists
+
+Context: The 'conductor/' directory was found in the project root.
+Expected: 'conductor/' should not exist before running setup.
+Suggestion: Remove the 'conductor/' directory first if you want to re-initialize.`);
     });
 
     it("should create workflow.md with full content", async () => {
