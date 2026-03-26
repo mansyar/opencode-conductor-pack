@@ -1,6 +1,7 @@
 import type { ToolContext } from "@opencode-ai/plugin";
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
 import { getProjectMaturity, inferTechStack, proposeInitialTrack } from "../utils/discovery.js";
 import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTemplate, trackSpecTemplate, trackPlanTemplate, trackMetadataTemplate } from "../artifacts/templates.js";
@@ -329,7 +330,25 @@ ${a["3"] || "_File Structure_"}
         break;
 
       case SetupStep.GIT:
-        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 Task 3 to continue.`;
+        try {
+          // Check for .git directory
+          const hasGit = fs.existsSync(path.join(directory, ".git"));
+          
+          if (!hasGit) {
+            execSync("git init", { cwd: directory, stdio: "ignore" });
+          }
+          
+          // Final commit
+          execSync("git add conductor/", { cwd: directory, stdio: "ignore" });
+          execSync("git commit -m 'conductor(setup): Add conductor setup files'", { cwd: directory, stdio: "ignore" });
+          
+          state = updateStep(directory, SetupStep.COMPLETE);
+        } catch (error) {
+          // If git fails, just complete anyway but warn the user
+          console.error("[CONDUCTOR] Git integration failed, completing anyway:", error);
+          state = updateStep(directory, SetupStep.COMPLETE);
+        }
+        break;
 
       default:
         return `[ERROR] Unknown setup step: ${state.currentStep}`;
