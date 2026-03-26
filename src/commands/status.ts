@@ -1,22 +1,22 @@
-import type { ToolContext } from "@opencode-ai/plugin";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import type { ToolContext } from '@opencode-ai/plugin';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { 
   extractTracksFromRegistry, 
   readTrackPlan, 
   parsePlanProgress,
   Track,
   PlanProgress 
-} from "../utils/parser";
+} from '../utils/parser';
 
 export async function executeStatusCommand(input: { client: any, directory: string }, context: ToolContext): Promise<string> {
   const { client } = input;
   const directory = input.directory || context.directory;
-  const registryPath = path.join(directory, "conductor", "tracks.md");
-  const registryDir = path.join(directory, "conductor");
+  const registryPath = path.join(directory, 'conductor', 'tracks.md');
+  const registryDir = path.join(directory, 'conductor');
 
   try {
-    const registryContent = await fs.readFile(registryPath, "utf-8");
+    const registryContent = await fs.readFile(registryPath, 'utf-8');
     const tracks = extractTracksFromRegistry(registryContent);
     const trackDetails: Array<{ track: Track, progress: PlanProgress | null }> = [];
 
@@ -41,8 +41,8 @@ export async function executeStatusCommand(input: { client: any, directory: stri
     
     // 1. Toast Notification
     await client.tui.showToast({
-      variant: "success",
-      title: "Conductor Status",
+      variant: 'success',
+      title: 'Conductor Status',
       message: `Project Progress: ${overallPercentage}% (${completedTasks}/${totalTasks} tasks completed)`
     });
 
@@ -56,8 +56,8 @@ export async function executeStatusCommand(input: { client: any, directory: stri
 
   } catch (error: any) {
     await client.tui.showToast({
-      variant: "error",
-      title: "Status Command Failed",
+      variant: 'error',
+      title: 'Status Command Failed',
       message: error.message
     });
     return `[CONDUCTOR] Failed to generate status: ${error.message}`;
@@ -102,7 +102,7 @@ function formatStatusSummary(
         md += `- **Next Action:** ${progress.nextAction}\n`;
       }
       if (progress.blockers.length > 0) {
-        md += `- **Blockers:** ${progress.blockers.join(", ")}\n`;
+        md += `- **Blockers:** ${progress.blockers.join(', ')}\n`;
       }
     } else {
       md += `- _(plan.md not found)_\n`;
@@ -110,7 +110,7 @@ function formatStatusSummary(
   });
 
   if (blockers.length > 0) {
-    md += `\n### 🚨 ALL BLOCKERS\n- ${blockers.join("\n- ")}\n`;
+    md += `\n### 🚨 ALL BLOCKERS\n- ${blockers.join('\n- ')}\n`;
   }
 
   md += `\n---

@@ -1,10 +1,10 @@
-import * as fs from "node:fs/promises";
-import path from "node:path";
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
 
 export interface Track {
   description: string;
   link: string;
-  status: "pending" | "completed" | "in-progress";
+  status: 'pending' | 'completed' | 'in-progress';
 }
 
 export interface PlanProgress {
@@ -26,7 +26,7 @@ export interface PlanProgress {
  */
 export function extractTracksFromRegistry(content: string): Track[] {
   const tracks: Track[] = [];
-  const lines = content.split("\n");
+  const lines = content.split('\n');
 
   // Regex Patterns
   // 1. Standard: - [ ] **Track: ...
@@ -52,10 +52,10 @@ export function extractTracksFromRegistry(content: string): Track[] {
       const match = standardMatch || legacyMatch;
       const statusChar = match![1];
       const description = match![2];
-
+      
       currentTrack = {
         description,
-        status: statusChar === "x" ? "completed" : statusChar === "~" ? "in-progress" : "pending"
+        status: statusChar === 'x' ? 'completed' : statusChar === '~' ? 'in-progress' : 'pending'
       };
       continue;
     }
@@ -78,8 +78,8 @@ export function extractTracksFromRegistry(content: string): Track[] {
  */
 export async function readTrackPlan(registryDir: string, trackLink: string): Promise<string | null> {
   try {
-    const planPath = path.resolve(registryDir, trackLink, "plan.md");
-    return await fs.readFile(planPath, "utf-8");
+    const planPath = path.resolve(registryDir, trackLink, 'plan.md');
+    return await fs.readFile(planPath, 'utf-8');
   } catch (error) {
     return null;
   }
@@ -89,7 +89,7 @@ export async function readTrackPlan(registryDir: string, trackLink: string): Pro
  * Parses the implementation plan markdown to tally progress.
  */
 export function parsePlanProgress(content: string): PlanProgress {
-  const lines = content.split("\n");
+  const lines = content.split('\n');
   let totalPhases = 0;
   let totalTasks = 0;
   let completedTasks = 0;
@@ -105,9 +105,9 @@ export function parsePlanProgress(content: string): PlanProgress {
     const trimmed = line.trim();
 
     // Parse Phases
-    if (trimmed.startsWith("## Phase")) {
+    if (trimmed.startsWith('## Phase')) {
       totalPhases++;
-      lastPhase = trimmed.replace(/^##\s+/, "");
+      lastPhase = trimmed.replace(/^##\s+/, '');
       continue;
     }
 
@@ -116,11 +116,11 @@ export function parsePlanProgress(content: string): PlanProgress {
     if (taskMatch) {
       totalTasks++;
       const status = taskMatch[1];
-      const taskName = taskMatch[2].split(" [checkpoint:")[0].trim(); // Remove checkpoint info
+      const taskName = taskMatch[2].split(' [checkpoint:')[0].trim(); // Remove checkpoint info
 
-      if (status === "x") {
+      if (status === 'x') {
         completedTasks++;
-      } else if (status === "~") {
+      } else if (status === '~') {
         inProgressTasks++;
         currentTask = taskName;
         currentPhase = lastPhase;
@@ -133,8 +133,8 @@ export function parsePlanProgress(content: string): PlanProgress {
     }
 
     // Parse Blockers
-    if (trimmed.toLowerCase().includes("blocker:")) {
-      blockers.push(trimmed.replace(/blocker:\s*/i, ""));
+    if (trimmed.toLowerCase().includes('blocker:')) {
+      blockers.push(trimmed.replace(/blocker:\s*/i, ''));
     }
   }
 
