@@ -26,5 +26,6 @@ describe("plugin entry point", () => {
     const result = await ConductorPlugin(input);
     expect(result).toHaveProperty("tool");
     expect(result.tool).toHaveProperty("conductor:setup");
+    expect(result.tool).toHaveProperty("conductor:status");
   });
 });
