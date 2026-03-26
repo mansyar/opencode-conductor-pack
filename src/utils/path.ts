@@ -37,13 +37,3 @@ export function resolveTracksRegistryPath(directory: string): string {
 export function resolveTrackPath(directory: string, trackId: string): string {
   return path.join(resolveTracksPath(directory), trackId);
 }
-
-/**
- * Check if the conductor directory exists
- */
-export function conductorExists(directory: string): boolean {
-  const conductorPath = resolveConductorPath(directory);
-  // Dynamic import to avoid issues with Vite browser externalization
-  // This check is done at runtime in the actual command
-  return false; // Placeholder - actual check happens in command
-}
