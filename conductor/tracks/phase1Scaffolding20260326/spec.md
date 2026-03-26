@@ -4,7 +4,7 @@
 
 The **Conductor Plugin Scaffolding** is the foundation of the OpenCode Conductor Plugin. It provides the essential `/conductor:setup` command that initializes a standardized `conductor/` directory structure in any project, along with a robust template system that creates all required artifact files.
 
-This phase establishes the **Project Isolation** principle: all paths resolve relative to `process.cwd()`, ensuring safe usage across multiple simultaneous projects.
+This phase establishes the **Project Isolation** principle: all paths resolve relative to OpenCode's `directory` context, ensuring safe usage across multiple simultaneous projects.
 
 ## 2. What & Why
 
@@ -29,7 +29,7 @@ This phase establishes the **Project Isolation** principle: all paths resolve re
 
 | Principle | Implementation |
 | :--- | :--- |
-| **Project Isolation** | All paths computed from `process.cwd()` |
+| **Project Isolation** | All paths computed from OpenCode's `directory` context |
 | **Artifact-First** | Markdown files are the source of truth |
 | **Guardrails** | Setup validates environment before creating files |
 | **Error Prevention** | Fails gracefully if `conductor/` already exists |
@@ -39,11 +39,13 @@ This phase establishes the **Project Isolation** principle: all paths resolve re
 ### `/conductor:setup`
 **Input:** None (no arguments required)
 
+**Implementation:** Custom tool registered via OpenCode's plugin `tool` API.
+
 **Behavior:**
 1. Check if `conductor/` already exists
    - If exists: Error with message "conductor/ already initialized. Remove it first to re-initialize."
    - If not: Continue
-2. Validate environment (Node.js version, working directory)
+2. Validate environment (Bun availability, working directory)
 3. Create directory structure
 4. Generate all template files with sensible defaults
 5. Initialize `tracks.md` with header
@@ -71,6 +73,7 @@ Contains structured sections:
 - ## Target Users
 - ## Core Features
 - ## Success Metrics
+- ## Technical Foundation
 
 ### product-guidelines.md
 Contains structured sections:
@@ -83,9 +86,9 @@ Contains structured sections:
 ### tech-stack.md
 Contains structured sections:
 - ## Programming Language
-- ## Core Architecture
+- ## Core Architecture (Plugin API, Events)
+- ## Package Management
 - ## File Structure
-- ## Dependencies
 
 ### workflow.md
 Contains structured sections:
@@ -112,14 +115,15 @@ conductor/
 ## 7. Technical Approach
 
 - **Language:** TypeScript
-- **Framework:** Vanilla Node.js with `@opencode/core` plugin API
-- **File Generation:** Template literals with placeholder replacement
-- **Path Handling:** Node.js `path` module with `process.cwd()` as base
+- **Plugin API:** `@opencode-ai/plugin` with `Plugin` type
+- **Tool Definition:** Using `tool()` helper from plugin package
+- **Path Handling:** Using OpenCode's `directory` context
+- **Template Generation:** Template literals with placeholder replacement
 - **Validation:** Environment checks before any file system operations
 
 ## 8. Out of Scope (Future Phases)
 
-- Context injection (Phase 2)
+- Context injection via session hooks (Phase 2)
 - Tool interception hooks (Phase 3)
 - TUI status bar (Phase 4)
 - Git integration commands (Phase 4)

@@ -2,49 +2,131 @@
 
 ## 1. Programming Language
 
-**TypeScript** — Strong typing throughout, excellent integration with OpenCode's APIs, catches errors at compile time rather than runtime.
+**TypeScript** — Strong typing throughout, excellent integration with OpenCode's plugin API, catches errors at compile time rather than runtime.
 
 ## 2. Core Architecture
 
-**Vanilla Node.js** — No heavy framework dependencies. Direct usage of:
-- Node.js built-in `events` module for the hook system
-- Native `fs`/`path` for file operations
-- OpenCode's plugin API for command registration and tool interception
+**OpenCode Plugin API** — Direct usage of OpenCode's plugin system:
 
-## 3. Testing
+```typescript
+import type { Plugin } from "@opencode-ai/plugin"
 
-**Vitest** — Fast unit tests with native ESM support, TypeScript-native, excellent watch mode for TDD.
+export const ConductorPlugin: Plugin = async ({ project, directory, worktree, client, $ }) => {
+  return {
+    // Hooks go here
+  }
+}
+```
 
-## 4. Build & Packaging
+### Plugin Context
+| Parameter | Description |
+| :--- | :--- |
+| `project` | Current project information |
+| `directory` | Current working directory (project root) |
+| `worktree` | Git worktree path |
+| `client` | OpenCode SDK client for AI interaction |
+| `$` | Bun's shell API for executing commands |
 
-**Vite** — Extremely fast builds, native TypeScript support, easy configuration for OpenCode plugin distribution.
+### Events Available
+- **Tool Events:** `tool.execute.before`, `tool.execute.after`
+- **Session Events:** `session.idle`, `session.compacted`, `session.created`, `session.updated`
+- **Shell Events:** `shell.env`
+- **File Events:** `file.edited`, `file.watcher.updated`
+- **TUI Events:** `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`
+
+## 3. Package Management
+
+**Bun** — OpenCode uses Bun for plugin dependency installation. Plugins declare dependencies in a `package.json` within the config directory.
+
+```json
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "latest",
+    "@opencode-ai/sdk": "latest"
+  }
+}
+```
+
+## 4. Dependencies
+
+### Production
+| Package | Purpose |
+| :--- | :--- |
+| `@opencode-ai/plugin` | Plugin API types and helpers |
+| `@opencode-ai/sdk` | SDK for server interaction |
+
+### Development
+| Package | Purpose |
+| :--- | :--- |
+| `typescript` | Language |
+| `vitest` | Unit testing |
+| `@types/node` | Node.js type definitions |
 
 ## 5. File Structure
 
 ```
 conductor-plugin/
 ├── src/
-│   ├── index.ts           # Plugin entry point
-│   ├── commands/          # /conductor:* command implementations
-│   ├── hooks/             # Tool interception hooks
-│   ├── artifacts/         # Artifact generation (product.md, plan.md, etc.)
-│   └── utils/             # Shared utilities
+│   ├── index.ts              # Plugin entry point (exports ConductorPlugin)
+│   ├── commands/
+│   │   ├── setup.ts          # /conductor:setup command
+│   │   ├── newTrack.ts       # /conductor:newTrack command
+│   │   └── status.ts         # /conductor:status command
+│   ├── hooks/
+│   │   ├── toolInterceptor.ts    # tool.execute.before/after hooks
+│   │   ├── sessionHooks.ts        # session.idle, session.compacted
+│   │   └── tuiHooks.ts            # tui.toast.show, etc.
+│   ├── artifacts/
+│   │   ├── templates.ts      # Template definitions
+│   │   └── generator.ts      # File generation logic
+│   └── utils/
+│       ├── path.ts           # Path utilities using directory context
+│       └── validator.ts      # Validation helpers
 ├── tests/
-│   └── *.test.ts          # Vitest unit tests
-├── dist/                  # Built output
-├── package.json
+│   └── *.test.ts             # Vitest unit tests
+├── .opencode/
+│   └── package.json          # Plugin dependencies
+├── package.json               # Project manifest
 ├── tsconfig.json
 ├── vite.config.ts
 └── README.md
 ```
 
-## 6. Dependencies
+## 6. Plugin Installation Locations
 
-### Production
-- `typescript` — Language
-- `vite` — Build tool
-- `@opencode/core` — OpenCode plugin API (to be confirmed)
+| Type | Path |
+| :--- | :--- |
+| Global Plugins | `~/.config/opencode/plugins/` |
+| Project Plugins | `.opencode/plugins/` |
+| Plugin Dependencies | `~/.config/opencode/package.json` |
 
-### Development
-- `vitest` — Testing
-- `@types/node` — Node.js type definitions
+## 7. Key Integration Points
+
+### Tool Interception
+```typescript
+"tool.execute.before": async (input, output) => {
+  // Validate tool call against plan.md
+  // Block or modify as needed
+}
+```
+
+### Custom Tools
+```typescript
+import { type Plugin, tool } from "@opencode-ai/plugin"
+
+tool: {
+  myTool: tool({
+    description: "Custom conductor tool",
+    args: { /* Zod schema */ },
+    async execute(args, context) { /* ... */ }
+  })
+}
+```
+
+### Session Compaction
+```typescript
+"experimental.session.compacting": async (input, output) => {
+  // Inject conductor context into compaction prompt
+  output.context.push(`## Current Track Status...`)
+}
+```

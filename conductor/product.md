@@ -6,9 +6,11 @@ The **OpenCode Conductor Plugin** brings Context-Driven Development (CDD) to AI-
 
 The plugin serves **AI-Assisted Developers** who want structured, reproducible, and artifact-driven development without sacrificing the flexibility of natural language interaction.
 
+Built on OpenCode's native **Plugin API**, it integrates seamlessly with the tool execution lifecycle, session management, and TUI events.
+
 ## 2. Target Users
 
-- **Primary:** Developers who actively use AI coding agents (Claude, GPT, Gemini, etc.) and want enforced structure
+- **Primary:** Developers who actively use OpenCode with AI coding agents and want enforced structure
 - **Secondary:** Teams integrating multiple AI agents that need shared project context
 - **Tertiary:** Solo developers who want discipline without bureaucracy
 
@@ -17,34 +19,42 @@ The plugin serves **AI-Assisted Developers** who want structured, reproducible, 
 ### Phase 1: Scaffolding (Foundation)
 - **`/conductor:setup` Command:** Creates the standardized `conductor/` directory structure with all required files
 - **Template System:** Hardcoded boilerplates for `product.md`, `tech-stack.md`, `product-guidelines.md`, `workflow.md`
-- **Path Isolation:** All file operations resolve relative to `process.cwd()` ensuring safe multi-project usage
+- **Path Isolation:** All file operations resolve relative to OpenCode's `directory` context ensuring safe multi-project usage
 
 ### Phase 2: Context Injection (The Brain)
-- **System Prompt Hook:** Injects `product.md` and `tech-stack.md` into the AI's global context
-- **Dynamic Track Loading:** Auto-detects active `<track_id>` and injects corresponding `spec.md`
+- **System Prompt Hook:** Uses `session.prompt` with `noReply: true` to inject `product.md` and `tech-stack.md` into the AI's context
+- **Dynamic Track Loading:** Auto-detects active `<track_id>` and injects corresponding `spec.md` via `experimental.session.compacting`
 - **Token Optimization:** Summarizer for large artifact files exceeding context windows
 
 ### Phase 3: Build Engine (The Muscle)
-- **Tool Interception:** Blocks edits if `plan.md` is missing or out of sync
-- **Auto-Progress:** Post-edit hook updates checkboxes in `plan.md` based on completed work
+- **Tool Interception:** Uses `tool.execute.before` hook to block edits if `plan.md` is missing or out of sync
+- **Auto-Progress:** Uses `tool.execute.after` hook to update checkboxes in `plan.md` based on completed work
 - **TDD Enforcement:** Requires test coverage before allowing implementation in specific directories
 
 ### Phase 4: Integration & Polish
-- **TUI Status Bar:** "Current Task" visual indicator in terminal
+- **TUI Status Bar:** Uses `tui.toast.show` and `tui.prompt.append` for "Current Task" visual indicators
 - **Git Integration:** `/conductor:commit` auto-generates messages from completed `plan.md` tasks
-- **Multi-Model Support:** Toggle between reasoning models (Planning) and fast models (Building)
+- **Session Hooks:** Uses `session.idle`, `session.compacted` events for workflow automation
 
 ## 4. Design Philosophy
 
 | Principle | Description |
 | :--- | :--- |
-| **Project Isolation** | All paths resolve relative to `process.cwd()` — safe for multiple simultaneous projects |
+| **Project Isolation** | All paths resolve relative to OpenCode's `directory` context — safe for multiple simultaneous projects |
 | **Artifact-First** | The agent reads from Markdown files, not just volatile chat history |
-| **Guardrails** | Tool calls are intercepted to ensure code strictly matches the approved plan |
+| **Guardrails** | Tool calls are intercepted via `tool.execute.before` to ensure code strictly matches the approved plan |
+| **Native Integration** | Leverages OpenCode's Plugin API (`@opencode-ai/plugin`) for seamless integration |
 
 ## 5. Success Metrics
 
 - Plugin creates valid `conductor/` structure in < 2 seconds
 - AI agent correctly reads and follows `plan.md` checkpoints
 - Zero "off-plan" code modifications when guardrails are active
-- Successful integration with OpenCode's tool execution lifecycle
+- Successful integration with OpenCode's tool execution lifecycle via Plugin API
+
+## 6. Technical Foundation
+
+The plugin is built on:
+- **Plugin API:** `@opencode-ai/plugin` for hooks, custom tools, and events
+- **SDK:** `@opencode-ai/sdk` for server interaction
+- **Bun:** Package management (as required by OpenCode)
