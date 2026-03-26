@@ -21,7 +21,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Implement `product-guidelines.md` and `tech-stack.md` dialogues. [967dce0]
     - [ ] For Brownfield: Present inferred stack for user confirmation/correction.
     - [ ] For Greenfield: Provide recommendations based on project goal.
-- [ ] Task: Implement Code Style Guide library selection.
+- [x] Task: Implement Code Style Guide library selection. [c963207]
     - [ ] Expose available style guides via the `question` tool and copy selected files.
 - [ ] Task: Conductor - User Manual Verification 'Interactive Dialogue & Artifact Generation' (Protocol in workflow.md)
 
