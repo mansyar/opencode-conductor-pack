@@ -1,7 +1,6 @@
 import type { ToolContext } from "@opencode-ai/plugin";
 import * as fs from "fs";
 import * as path from "path";
-import { execSync } from "child_process";
 import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
 import { getProjectMaturity, inferTechStack, proposeInitialTrack } from "../utils/discovery.js";
 import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTemplate, trackSpecTemplate, trackPlanTemplate, trackMetadataTemplate } from "../artifacts/templates.js";
@@ -10,8 +9,9 @@ import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTe
  * Executes the /conductor:setup command
  * Refactored into a stateful, interactive wizard.
  */
-export async function executeSetupCommand(client: any, context: ToolContext): Promise<string> {
-  const directory = context.directory;
+export async function executeSetupCommand(input: { client: any, $: any, directory: string, worktree?: string }, context: ToolContext): Promise<string> {
+  const { client, $ } = input;
+  const directory = input.directory || context.directory;
   let state = readState(directory);
 
   if (state && state.currentStep !== SetupStep.COMPLETE) {
@@ -335,12 +335,12 @@ ${a["3"] || "_File Structure_"}
           const hasGit = fs.existsSync(path.join(directory, ".git"));
           
           if (!hasGit) {
-            execSync("git init", { cwd: directory, stdio: "ignore" });
+            await $`git init`.cwd(directory).quiet();
           }
           
           // Final commit
-          execSync("git add conductor/", { cwd: directory, stdio: "ignore" });
-          execSync("git commit -m 'conductor(setup): Add conductor setup files'", { cwd: directory, stdio: "ignore" });
+          await $`git add conductor/`.cwd(directory).quiet();
+          await $`git commit -m 'conductor(setup): Add conductor setup files'`.cwd(directory).quiet();
           
           state = updateStep(directory, SetupStep.COMPLETE);
         } catch (error) {
