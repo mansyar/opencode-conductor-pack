@@ -397,6 +397,26 @@ A task is complete when:
 `;
 
 /**
+ * Index template - central hub for project context
+ */
+export const indexTemplate: string = `# Project Context: Conductor Index
+
+This is the central hub for project documentation and context.
+
+## Core Artifacts
+- **[Product Definition](./product.md):** Vision, goals, and core features.
+- **[Tech Stack](./tech-stack.md):** Technology choices and architecture.
+- **[Product Guidelines](./product-guidelines.md):** Communication and prose style.
+- **[Workflow](./workflow.md):** Development lifecycle and quality gates.
+
+## Tracks Registry
+- **[Tracks](./tracks.md):** List of all major development tracks.
+
+## Code Style Guides
+- **[Style Guides](./code_styleguides/):** Directory containing language-specific style guides.
+`;
+
+/**
  * Tracks Registry template - initial tracks.md structure
  */
 export const tracksRegistryTemplate: string = `# Project Tracks
@@ -411,6 +431,7 @@ This file tracks all major tracks for the project. Each track has its own detail
  */
 export function getConductorTemplates(): TemplateFile[] {
   return [
+    { filename: "index.md", content: indexTemplate },
     { filename: "product.md", content: productTemplate },
     { filename: "product-guidelines.md", content: productGuidelinesTemplate },
     { filename: "tech-stack.md", content: techStackTemplate },

@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { SetupStep, readState, writeState, updateStep } from "../utils/state.js";
 import { getProjectMaturity, inferTechStack } from "../utils/discovery.js";
-import { getStyleGuideLibrary } from "../artifacts/templates.js";
+import { getStyleGuideLibrary, workflowTemplate, tracksRegistryTemplate, indexTemplate } from "../artifacts/templates.js";
 
 /**
  * Executes the /conductor:setup command
@@ -259,7 +259,24 @@ ${a["3"] || "_File Structure_"}
         break;
 
       case SetupStep.SCAFFOLDING:
-        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 to continue.`;
+        const conductorDir = path.join(directory, "conductor");
+        
+        // Create constant artifacts
+        fs.writeFileSync(path.join(conductorDir, "index.md"), indexTemplate, "utf-8");
+        fs.writeFileSync(path.join(conductorDir, "workflow.md"), workflowTemplate, "utf-8");
+        fs.writeFileSync(path.join(conductorDir, "tracks.md"), tracksRegistryTemplate, "utf-8");
+        
+        // Ensure tracks directory exists
+        const tracksDir = path.join(conductorDir, "tracks");
+        if (!fs.existsSync(tracksDir)) {
+          fs.mkdirSync(tracksDir, { recursive: true });
+        }
+
+        state = updateStep(directory, SetupStep.TRACKS);
+        break;
+
+      case SetupStep.TRACKS:
+        return `[CONDUCTOR] Setup paused at step: ${state.currentStep}. Implement Phase 3 Task 2 to continue.`;
 
       default:
         return `[ERROR] Unknown setup step: ${state.currentStep}`;

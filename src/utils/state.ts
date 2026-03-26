@@ -9,6 +9,7 @@ export enum SetupStep {
   TECH_STACK = "tech_stack",
   STYLE_GUIDES = "style_guides",
   SCAFFOLDING = "scaffolding",
+  TRACKS = "tracks",
   GIT = "git",
   COMPLETE = "complete",
 }

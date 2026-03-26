@@ -41,7 +41,7 @@ describe("setup command", () => {
   });
 
   describe("executeSetupCommand", () => {
-    it("should initialize discovery and move through product, guidelines, and tech stack to style guides", async () => {
+    it("should initialize discovery and move through all steps to tracks", async () => {
       const context = createMockContext(testDir);
       const client = createMockClient();
       
@@ -54,7 +54,10 @@ describe("setup command", () => {
       
       const result = await executeSetupCommand(client as any, context as any);
 
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
+      expect(fs.existsSync(path.join(conductorDir, "index.md"))).toBe(true);
+      expect(fs.existsSync(path.join(conductorDir, "workflow.md"))).toBe(true);
+      expect(fs.existsSync(path.join(conductorDir, "tracks.md"))).toBe(true);
     });
 
     it("should ask to resume if state exists", async () => {
@@ -81,7 +84,7 @@ describe("setup command", () => {
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
     });
 
     it("should restart from discovery if user chooses not to resume", async () => {
@@ -108,11 +111,11 @@ describe("setup command", () => {
       const result = await executeSetupCommand(client as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
       
       const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
-      expect(state.currentStep).toBe("scaffolding");
-      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides"]);
+      expect(state.currentStep).toBe("tracks");
+      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides", "scaffolding"]);
     });
 
     it("should generate product.md using interactive questions", async () => {
@@ -140,7 +143,7 @@ describe("setup command", () => {
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -162,7 +165,7 @@ describe("setup command", () => {
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -196,7 +199,7 @@ describe("setup command", () => {
 
       const result = await executeSetupCommand(client as any, context as any);
       
-      expect(result).toContain("Setup paused at step: scaffolding");
+      expect(result).toContain("Setup paused at step: tracks");
       expect(fs.existsSync(path.join(conductorDir, "product-guidelines.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tech-stack.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "typescript.md"))).toBe(true);
