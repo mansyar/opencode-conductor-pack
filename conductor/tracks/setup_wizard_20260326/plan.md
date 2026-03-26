@@ -18,7 +18,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
 - [x] Task: Implement Interactive `product.md` generator. [933e69d]
     - [ ] Use `client.tool.execute('question', ...)` for structured input.
     - [ ] Implement AI-driven "Autogenerate" mode for quick starts.
-- [ ] Task: Implement `product-guidelines.md` and `tech-stack.md` dialogues.
+- [x] Task: Implement `product-guidelines.md` and `tech-stack.md` dialogues. [967dce0]
     - [ ] For Brownfield: Present inferred stack for user confirmation/correction.
     - [ ] For Greenfield: Provide recommendations based on project goal.
 - [ ] Task: Implement Code Style Guide library selection.
