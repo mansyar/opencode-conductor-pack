@@ -41,3 +41,6 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
     - [x] Mock the `question` tool and verify state transitions.
     - [x] Verify file system outputs for different setup paths.
 - [x] Task: Conductor - User Manual Verification 'Finalization & Integration' (Protocol in workflow.md)
+
+## Phase 5: Review Fixes
+- [x] Task: Update documentation and finalize SDK alignment [97a8471]

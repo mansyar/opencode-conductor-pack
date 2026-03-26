@@ -581,11 +581,11 @@ This plan outlines the steps to implement {{track_title}}.
 /**
  * Track Metadata template
  */
-export const trackMetadataTemplate: string = \`{
+export const trackMetadataTemplate: string = `{
   "id": "{{track_id}}",
   "title": "{{track_title}}",
   "description": "{{track_description}}",
   "created": "{{created_date}}",
   "status": "pending"
 }
-\`;
+`;

@@ -22,6 +22,15 @@ const createMockClient = () => ({
   },
 });
 
+// Mock Shell ($)
+const createMockShell = () => {
+  const shell: any = vi.fn(() => shell);
+  shell.cwd = vi.fn().mockReturnThis();
+  shell.quiet = vi.fn().mockReturnThis();
+  shell.then = (resolve: any) => resolve({ exitCode: 0 });
+  return shell;
+};
+
 describe("setup command", () => {
   const testDir = path.join(process.cwd(), "test-conductor-temp");
   const conductorDir = path.join(testDir, "conductor");
@@ -53,9 +62,9 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md"] } }); // styleGuides
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Initial Track" } }); // tracks (Initial Track)
       
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
 
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
       expect(fs.existsSync(path.join(conductorDir, "index.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tracks.md"))).toBe(true);
       
@@ -87,10 +96,10 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
     });
 
     it("should restart from discovery if user chooses not to resume", async () => {
@@ -115,14 +124,14 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
       
       expect(client.tool.execute).toHaveBeenCalledWith("question", expect.any(Object));
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
       
       const state = JSON.parse(fs.readFileSync(path.join(conductorDir, "setup_state.json"), "utf-8"));
-      expect(state.currentStep).toBe("git");
-      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides", "scaffolding", "tracks"]);
+      expect(state.currentStep).toBe("complete");
+      expect(state.completedSteps).toEqual(["discovery", "product", "guidelines", "tech_stack", "style_guides", "scaffolding", "tracks", "git"]);
     });
 
     it("should generate product.md using interactive questions", async () => {
@@ -149,9 +158,9 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
       
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -172,9 +181,9 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": [] } }); // styleguides
       client.tool.execute.mockResolvedValueOnce({ answers: {} }); // tracks
 
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
       
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
       expect(fs.existsSync(path.join(conductorDir, "product.md"))).toBe(true);
       
       const content = fs.readFileSync(path.join(conductorDir, "product.md"), "utf-8");
@@ -207,9 +216,9 @@ describe("setup command", () => {
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": ["typescript.md", "general.md"] } }); // styleguides
       client.tool.execute.mockResolvedValueOnce({ answers: { "0": "Fix Bugs" } }); // tracks
 
-      const result = await executeSetupCommand(client as any, context as any);
+      const result = await executeSetupCommand({ client, $: createMockShell(), directory: testDir } as any, context as any);
       
-      expect(result).toContain("Setup paused at step: git");
+      expect(result).toContain("[CONDUCTOR] Setup complete!");
       expect(fs.existsSync(path.join(conductorDir, "product-guidelines.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "tech-stack.md"))).toBe(true);
       expect(fs.existsSync(path.join(conductorDir, "code_styleguides", "typescript.md"))).toBe(true);
