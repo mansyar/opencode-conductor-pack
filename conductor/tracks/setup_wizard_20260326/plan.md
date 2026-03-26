@@ -25,7 +25,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
     - [ ] Expose available style guides via the `question` tool and copy selected files.
 - [x] Task: Conductor - User Manual Verification 'Interactive Dialogue & Artifact Generation' (Protocol in workflow.md)
 
-## Phase 3: Tracks & Scaffolding
+## Phase 3: Tracks & Scaffolding [checkpoint: 0c03e28]
 - [x] Task: Create the `conductor/index.md` context hub. [fdbf5b8]
 - [x] Task: Implement the Initial Track Scaffolder. [1a70f13]
     - [x] Logic to propose a track title based on product definition.
@@ -33,7 +33,7 @@ This plan refactors the `conductor:setup` command into a state-aware, interactiv
     - [x] Registry update in `conductor/tracks.md`.
 - [x] Task: Implement Git Integration. [e632452]
     - [x] Trigger `git init` where needed and perform the final `conductor(setup)` commit.
-- [ ] Task: Conductor - User Manual Verification 'Tracks & Scaffolding' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Tracks & Scaffolding' (Protocol in workflow.md)
 
 ## Phase 4: Integration & Validation
 - [ ] Task: Final wiring in `src/index.ts`.
