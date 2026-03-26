@@ -10,11 +10,11 @@
     - [x] Create basic test setup with Vitest
     - [x] Verify build and test commands work with pnpm
 
-- [ ] Task: Create OpenCode plugin entry point structure
-    - [ ] Create src/index.ts as plugin entry (exports ConductorPlugin)
-    - [ ] Create src/commands/ directory
-    - [ ] Set up basic plugin API integration using @opencode-ai/plugin
-    - [ ] Verify plugin loads in OpenCode
+- [x] Task: Create OpenCode plugin entry point structure
+    - [x] Create src/index.ts as plugin entry (exports ConductorPlugin)
+    - [x] Create src/commands/ directory
+    - [x] Set up basic plugin API integration using @opencode-ai/plugin
+    - [x] Verify plugin loads in OpenCode
 
 - [ ] Task: Implement path isolation utilities
     - [ ] Create src/utils/path.ts
