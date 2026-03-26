@@ -1,17 +1,26 @@
-# Blueprint & Roadmap: OpenCode Conductor Plugin (CDD)
+# Blueprint & Roadmap: Conductor Agent Workflow Pack (CDD)
 
 ## 1. Project Blueprint: Architecture
-The plugin follows the "Context-Driven Development" (CDD) pattern where the codebase 
-carries its own "brain" in a standardized directory.
+The Conductor system follows the "Context-Driven Development" (CDD) pattern where the codebase carries its own "brain" in a standardized directory. 
+
+Instead of acting as a TypeScript CLI plugin that intercepts tools or manipulates prompt injection via SDKs, it operates natively as an **Agent Workflow Pack**. The agent manages its own state by reading from and writing to markdown files directly.
 
 ### A. Core Philosophy
-- **Project Isolation:** All paths are resolved relative to `process.cwd()`.
-- **Artifact-First:** The agent reads from Markdown files, not just chat history.
-- **Guardrails:** The plugin intercepts tool calls to ensure code matches the plan.
+- **Native Alignment:** The AI natively parses `.agents/workflows/` rather than relying on external programmatic state machines.
+- **Artifact-First:** The agent reads from structured Markdown files instead of relying on limited short-term chat history.
+- **The Checkbox Rule:** The agent proactively plans its actions against a `plan.md` track and updates checkboxes organically.
+- **Just-In-Time Context:** Using modular `<skills>` and workflows allows the agent to pull specific context (like UI guidelines) exactly when it's needed, preventing context-window dilution.
 
-### B. Folder Structure (Gemini CLI Mirror)
-To ensure 100% parity with the original Conductor extension:
+### B. Folder Structure
+
+```text
 your-project/
+├── .agent/
+│   ├── rules.md                  # Global system prompt/rules for the agent
+│   └── workflows/                # Agent executable workflows
+│       ├── conductor-setup.md    # Agent instructions to scaffold /conductor
+│       ├── conductor-status.md   # Agent instructions to read tracks
+│       └── conductor-*.md        # Other lifecycle operations
 └── conductor/
     ├── product.md                # High-level vision & goals
     ├── product-guidelines.md     # Voice, UI, and UX standards
@@ -23,44 +32,31 @@ your-project/
         └── <track_id>/           # Unique feature folder
             ├── spec.md           # The "What" and "Why"
             └── plan.md           # The "How" (Task Checklist)
+```
 
 ---
 
-## 2. State Machine: Workflow Modes
-1. IDLE: Default OpenCode behavior.
-2. PLANNING: Triggered by `/conductor:new`. Uses high-reasoning models (o1/Claude 4.5).
-3. BUILDING: Triggered by `/conductor:build`. Activates strict plan-following hooks.
-4. VERIFYING: Post-build check against the `spec.md`.
+## 2. The Checkbox Workflow Lifecycle
+1. **Global Enforcement:** The agent acts under the global identity of the "Conductor."
+2. **Setup:** The agent runs the `/conductor-setup` workflow to scaffold context files.
+3. **Planning (New Track):** Triggered via `/conductor-newtrack`. The agent writes `spec.md` and `plan.md` into a new track folder.
+4. **Execution (Implementation):** Triggered via `/conductor-implement`. The agent works natively through `plan.md` checkmarks, doing Test-Driven Development implicitly.
+5. **Review:** Triggered by `/conductor-review`. The agent checks its own work against `spec.md` and the broader `product.md` guidelines.
 
 ---
 
 ## 3. Development Roadmap
 
-### Phase 1: Scaffolding (The Alpha)
-- [ ] Implement `/conductor:setup`: Creates the directory structure + .gitignore entries.
-- [ ] Define Templates: Hardcode the boilerplate for `product.md`, `tech-stack.md`, etc.
-- [ ] Path Isolation: Ensure all `$` shell calls use absolute paths derived from the 
-      OpenCode `directory` context.
+### Phase 1: Core Lifecycle Workflows (Scaffolding & Planning)
+- [ ] Define the global `<user_rules>` system prompt template to convert default agents into "Conductors."
+- [ ] Implement `conductor-setup.md` workflow for initializing project boilerplate.
+- [ ] Implement `conductor-newtrack.md` workflow for planning and task breakdown.
 
-### Phase 2: Context Injection (The Brain)
-- [ ] System Prompt Hook: Use `experimental.chat.system.transform` to inject 
-      `product.md` and `tech-stack.md` into the global context.
-- [ ] Dynamic Track Loading: Logic to detect which `<track_id>` is active and 
-      auto-inject the corresponding `spec.md`.
-- [ ] Token Optimization: Implement a "summarizer" if the conductor files exceed 
-      the model's effective context window.
+### Phase 2: Execution & Verification Workflows
+- [ ] Implement `conductor-implement.md` to guide the agent through sequential code generation and plan checklist updating.
+- [ ] Implement `conductor-review.md` for validating test coverage and feature parity before marking a track complete.
+- [ ] Implement `conductor-status.md` to audit the project and `tracks.md` state.
 
-### Phase 3: The Build Engine (The Muscle)
-- [ ] Tool Interception: Use `tool.execute.before` to block edits if `plan.md` 
-      is missing or out of sync.
-- [ ] Auto-Progress: Post-edit hook that updates checkboxes in `plan.md` 
-      based on the agent's completed tool calls.
-- [ ] TDD Enforcement: Hook that requires a `test` tool call before allowing 
-      a `write_file` call in specific directories.
-
-### Phase 4: Integration & UX (The Polish)
-- [ ] TUI Status Bar: Add a "Current Task" visual indicator in the OpenCode terminal.
-- [ ] Git Integration: `/conductor:commit` tool that auto-generates a message 
-      based on the completed `plan.md` tasks.
-- [ ] Multi-Model Support: Configuration to automatically toggle models 
-      (e.g., Gemini 3 Pro for Planning -> Gemini 3 Flash for Building).
+### Phase 3: Specialized Skills
+- [ ] Create specialized `SKILL.md` documents (e.g., teaching the agent how to navigate massive codebases vs. small codebases under the Conductor framework).
+- [ ] Establish sub-workflows for complex state rollbacks (`/conductor-revert`).

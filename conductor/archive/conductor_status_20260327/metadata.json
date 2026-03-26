@@ -1,8 +1,0 @@
-{
-  "track_id": "conductor_status_20260327",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-03-27T07:51:00Z",
-  "updated_at": "2026-03-27T07:51:00Z",
-  "description": "implement the /conductor:status by following/matching the flow in @[docs/workflows-references/conductor-status.md]"
-}
