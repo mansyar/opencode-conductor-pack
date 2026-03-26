@@ -1,0 +1,7 @@
+# Exclude Node modules and Git
+node_modules/
+.git/
+
+# NEVER ignore the core workflow directory
+!.opencode/
+!.opencode/**/*

@@ -3,24 +3,28 @@
 ## 1. Project Blueprint: Architecture
 The Conductor system follows the "Context-Driven Development" (CDD) pattern where the codebase carries its own "brain" in a standardized directory. 
 
-Instead of acting as a TypeScript CLI plugin that intercepts tools or manipulates prompt injection via SDKs, it operates natively as an **Agent Workflow Pack**. The agent manages its own state by reading from and writing to markdown files directly.
+Instead of acting as a TypeScript CLI plugin that intercepts tools or manipulates prompt injection via SDKs, it operates natively across OpenCode's **Agents**, **Commands**, and **Skills** architecture. The agent manages its own state by reading from and writing to markdown files directly.
 
 ### A. Core Philosophy
-- **Native Alignment:** The AI natively parses `.agents/workflows/` rather than relying on external programmatic state machines.
+- **Native Alignment:** The AI natively parses `.opencode/commands/` and `.opencode/agents/` rather than relying on external programmatic state machines.
 - **Artifact-First:** The agent reads from structured Markdown files instead of relying on limited short-term chat history.
 - **The Checkbox Rule:** The agent proactively plans its actions against a `plan.md` track and updates checkboxes organically.
-- **Just-In-Time Context:** Using modular `<skills>` and workflows allows the agent to pull specific context (like UI guidelines) exactly when it's needed, preventing context-window dilution.
+- **Just-In-Time Context:** Using modular `.opencode/skills/` allows the agent to pull specific context (like UI guidelines) exactly when it's needed, preventing context-window dilution.
 
 ### B. Folder Structure
 
 ```text
 your-project/
-├── .agent/
-│   ├── rules.md                  # Global system prompt/rules for the agent
-│   └── workflows/                # Agent executable workflows
-│       ├── conductor-setup.md    # Agent instructions to scaffold /conductor
-│       ├── conductor-status.md   # Agent instructions to read tracks
-│       └── conductor-*.md        # Other lifecycle operations
+├── .opencode/
+│   ├── agents/                   # Agent definitions
+│   │   └── conductor.md          # The global Conductor agent system prompt
+│   ├── commands/                 # Executable workflows (Commands)
+│   │   ├── conductor-setup.md    # Action: /conductor-setup
+│   │   ├── conductor-status.md   # Action: /conductor-status
+│   │   └── conductor-*.md        # Other lifecycle operations
+│   └── skills/                   # Modular Agent Skills
+│       └── conductor-cdd/        
+│           └── SKILL.md          # Teaches any agent how to use the CDD framework
 └── conductor/
     ├── product.md                # High-level vision & goals
     ├── product-guidelines.md     # Voice, UI, and UX standards
@@ -37,8 +41,8 @@ your-project/
 ---
 
 ## 2. The Checkbox Workflow Lifecycle
-1. **Global Enforcement:** The agent acts under the global identity of the "Conductor."
-2. **Setup:** The agent runs the `/conductor-setup` workflow to scaffold context files.
+1. **Global Enforcement:** The agent operates under the `conductor.md` agent identity.
+2. **Setup:** The user runs the `/conductor-setup` command to scaffold context files.
 3. **Planning (New Track):** Triggered via `/conductor-newtrack`. The agent writes `spec.md` and `plan.md` into a new track folder.
 4. **Execution (Implementation):** Triggered via `/conductor-implement`. The agent works natively through `plan.md` checkmarks, doing Test-Driven Development implicitly.
 5. **Review:** Triggered by `/conductor-review`. The agent checks its own work against `spec.md` and the broader `product.md` guidelines.
@@ -48,15 +52,15 @@ your-project/
 ## 3. Development Roadmap
 
 ### Phase 1: Core Lifecycle Workflows (Scaffolding & Planning)
-- [ ] Define the global `<user_rules>` system prompt template to convert default agents into "Conductors."
-- [ ] Implement `conductor-setup.md` workflow for initializing project boilerplate.
-- [ ] Implement `conductor-newtrack.md` workflow for planning and task breakdown.
+- [ ] Define the global `.opencode/agents/conductor.md` system prompt.
+- [ ] Implement `.opencode/commands/conductor-setup.md` command for initializing project boilerplate.
+- [ ] Implement `.opencode/commands/conductor-newtrack.md` command for planning and task breakdown.
 
 ### Phase 2: Execution & Verification Workflows
-- [ ] Implement `conductor-implement.md` to guide the agent through sequential code generation and plan checklist updating.
-- [ ] Implement `conductor-review.md` for validating test coverage and feature parity before marking a track complete.
-- [ ] Implement `conductor-status.md` to audit the project and `tracks.md` state.
+- [ ] Implement `.opencode/commands/conductor-implement.md` to guide the agent through sequential code generation and plan checklist updating.
+- [ ] Implement `.opencode/commands/conductor-review.md` for validating test coverage and feature parity before marking a track complete.
+- [ ] Implement `.opencode/commands/conductor-status.md` to audit the project and `tracks.md` state.
 
 ### Phase 3: Specialized Skills
-- [ ] Create specialized `SKILL.md` documents (e.g., teaching the agent how to navigate massive codebases vs. small codebases under the Conductor framework).
-- [ ] Establish sub-workflows for complex state rollbacks (`/conductor-revert`).
+- [ ] Create specialized `SKILL.md` documents in `.opencode/skills/` (e.g., teaching the agent how to navigate massive codebases vs. small codebases under the Conductor framework).
+- [ ] Establish sub-commands for complex state rollbacks (`/conductor-revert`).

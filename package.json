@@ -1,0 +1,28 @@
+{
+  "name": "opencode-conductor-pack",
+  "version": "1.0.0",
+  "description": "Context-Driven Development automated workflows for OpenCode",
+  "main": "bin/init.js",
+  "bin": {
+    "init-conductor": "bin/init.js"
+  },
+  "files": [
+    "bin",
+    ".opencode",
+    "docs",
+    "README.md"
+  ],
+  "scripts": {
+    "sync": "node scripts/sync-commands.js",
+    "prepack": "npm run sync",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "opencode",
+    "agent",
+    "cdd",
+    "conductor"
+  ],
+  "author": "",
+  "license": "MIT"
+}
