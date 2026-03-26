@@ -76,11 +76,11 @@ Link: [./tracks/legacy/](./tracks/legacy/)
       const content = `
 # Implementation Plan
 ## Phase 1: Setup
-- [x] Task 1
-- [~] Task 2
+- [x] Task: Task 1
+- [~] Task: Task 2
 ## Phase 2: Work
-- [ ] Task 3
-- [ ] Task 4
+- [ ] Task: Task 3
+- [ ] Task: Task 4
 Blocker: API is down
 `;
       const progress = parsePlanProgress(content);
