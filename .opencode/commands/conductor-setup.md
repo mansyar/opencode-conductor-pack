@@ -530,3 +530,6 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 1.  **Announce Completion:** After the track has been created, announce that the project setup and initial track generation are complete.
 2.  **Save Conductor Files:** Add and commit all files with the commit message `conductor(setup): Add conductor setup files`.
 3.  **Next Steps:** Inform the user that they can now begin work by running `/conductor:implement`.
+
+---
+**CRITICAL TOOL USAGE NOTE:** When using the `question` tool, NEVER place long drafted content (like generated guides, plans, or file contents) inside the question description or options. ALWAYS output long content directly into the standard chat message first, so the user can review it comfortably. Then, use the `question` tool exclusively for the short verification question itself (e.g., "Do you approve the draft above?", Options: "1. Approve", "2. Suggest changes").

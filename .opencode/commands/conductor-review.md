@@ -232,3 +232,6 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
         ii.  **If yes:** Delete track folder, remove from **Tracks Registry**, commit (`chore(conductor): Delete track '<track_name>'`), announce success.
         iii. **If no:** Cancel.
     *   **If "Skip":** Leave track as is.
+
+---
+**CRITICAL TOOL USAGE NOTE:** When using the `question` tool, NEVER place long drafted content (like generated guides, plans, or file contents) inside the question description or options. ALWAYS output long content directly into the standard chat message first, so the user can review it comfortably. Then, use the `question` tool exclusively for the short verification question itself (e.g., "Do you approve the draft above?", Options: "1. Approve", "2. Suggest changes").

@@ -182,3 +182,6 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
     -   **Commit Changes:** Stage the **Tracks Registry** files and commit with the message `chore(conductor): Add new track '<track_description>'`.
 9.  **Announce Completion:** Inform the user:
     > "New track '<track_id>' has been created and added to the tracks file. You can now start implementation by running `/conductor:implement`."
+
+---
+**CRITICAL TOOL USAGE NOTE:** When using the `question` tool, NEVER place long drafted content (like generated guides, plans, or file contents) inside the question description or options. ALWAYS output long content directly into the standard chat message first, so the user can review it comfortably. Then, use the `question` tool exclusively for the short verification question itself (e.g., "Do you approve the draft above?", Options: "1. Approve", "2. Suggest changes").
